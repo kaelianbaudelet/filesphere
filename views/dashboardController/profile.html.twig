@@ -1,0 +1,57 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Mon espace
+{% endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="app-body-main-content">
+		<section class="page-section">
+			<div class="page-header">
+				<h2>Votre profil</h2>
+			</div>
+			<div class="profile">
+				<div class="profile-info">
+					<h1>
+						Informations de compte
+					</h1>
+					<div class="profile-info-item">
+						<span>Nom</span>
+						<span>{{ user.name }}</span>
+					</div>
+					<div class="profile-info-item">
+						<span>Role</span>
+						<span>
+							{% if user.role == 'admin' %}
+								Administrateur
+							{% elseif user.role == 'teacher' %}
+								Professeur
+							{% elseif user.role == 'student' %}
+								Etudiant
+							{% endif %}
+						</span>
+					</div>
+					<div class="profile-info-item">
+						<span>Email</span>
+						<span>{{ user.email }}</span>
+					</div>
+				</div>
+				<div>
+					<form action="/dashboard/profile/editpassword" method="post" class="form">
+						<h1>Changer le mot de passe</h1>
+						<input type="hidden" name="user_id" value="{{ user.id }}">
+						<div class="form-part">
+							<label for="new_password">Nouveau mot de passe</label>
+							<input type="password" name="new_password" id="new_password" placeholder="Nouveau mot de passe">
+						</div>
+						<div class="form-part">
+							<label for="confirm_new_password">Confirmer le nouveau mot de passe</label>
+							<input type="password" name="confirm_new_password" id="confirm_new_password" placeholder="Confirmer le nouveau mot de passe">
+						</div>
+						<button type="submit">Modifier</button>
+					</form>
+				</div>
+			</div>
+		</section>
+	</div>
+{% endblock %}

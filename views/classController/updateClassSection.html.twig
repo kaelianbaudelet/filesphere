@@ -1,0 +1,52 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Editer
+	{{ section.name }}
+	dans
+	{{ class.name }}
+{% endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="app-body-main-content">
+		<section class="page-section">
+			<div class="page-breacrumb">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/classes">
+								Classes
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item active" aria-current="page">
+							Modifier la classe
+							{{ class.name }}
+
+						</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="page-header">
+				<h2>
+					Modifier la section
+					{{ section.name }}
+					dans
+					{{ class.name }}
+				</h2>
+			</div>
+			<div class="update-user">
+				<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/edit" method="POST" class="form">
+					<h1>Information de la section</h1>
+					<div class="form-part">
+						<input type="text" name="name" placeholder="Nom de la section" value="{{ section.name }}">
+					</div>
+					<button type="submit">Modifier</button>
+				</form>
+			</div>
+
+		</section>
+	</div>
+{% endblock %}

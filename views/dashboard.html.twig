@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<!-- global meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta name="keywords" content="livrables, projets, devoirs, dépôt, suivi, étudiants">
+		<meta
+		name="author" content="FileSphere">
+		<!-- social meta tags -->
+		<meta name="robots" content="index, follow">
+		<meta name="googlebot" content="index, follow">
+		<meta
+		name="bingbot" content="index, follow">
+		<!-- facebook and twitter meta tags -->
+		<meta property="og:title" content="File Sphere - Plateforme de dépôt et de suivi de livrables">
+		<meta property="og:description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta property="og:image" content="{{ asset('/images/bg.png') }}">
+		<meta
+		property="og:url" content="https://www.hotelneptune.com">
+		<!-- twitter meta tags -->
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="FileSphere - Plateforme de dépôt et de suivi de livrables">
+		<meta name="twitter:description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta name="twitter:image" content="{{ asset('/images/bg.png') }}">
+		{% block css %}
+			<link rel="stylesheet" href="{{ asset('/css/main.css') }}?v={{ random() }}"/>
+		{% endblock %}
+		<title>
+			FileSphere —
+			{% block title %}{% endblock %}
+		</title>
+	</head>
+	<body>
+		<div class="app">
+			{% include 'components/changePasswordForm.html.twig' %}
+			<div class="app-body">
+				<div class="app-body-navigation">
+					<div class="navigation-container">
+						<div class="navigation-header">
+							<a href="/dashboard">
+								<img class="logo" src="/assets/images/logo.svg"/>
+							</a>
+							<button id="toggle-navigation" class="toggle-navigation">
+								<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M6 12H18M6 12L11 7M6 12L11 17" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</button>
+						</div>
+						<nav class="navigation">
+							<a href="/dashboard" class="{{ current_route() == 'dashboard' ? 'active' : '' }}">
+								<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path fill-rule="evenodd" clip-rule="evenodd" d="M2.5192 7.82274C2 8.77128 2 9.91549 2 12.2039V13.725C2 17.6258 2 19.5763 3.17157 20.7881C4.34315 22 6.22876 22 10 22H14C17.7712 22 19.6569 22 20.8284 20.7881C22 19.5763 22 17.6258 22 13.725V12.2039C22 9.91549 22 8.77128 21.4808 7.82274C20.9616 6.87421 20.0131 6.28551 18.116 5.10812L16.116 3.86687C14.1106 2.62229 13.1079 2 12 2C10.8921 2 9.88939 2.62229 7.88403 3.86687L5.88403 5.10813C3.98695 6.28551 3.0384 6.87421 2.5192 7.82274ZM9 17.25C8.58579 17.25 8.25 17.5858 8.25 18C8.25 18.4142 8.58579 18.75 9 18.75H15C15.4142 18.75 15.75 18.4142 15.75 18C15.75 17.5858 15.4142 17.25 15 17.25H9Z" fill="#000000"/>
+								</svg>
+								<span>
+									Tableau de bord
+								</span>
+							</a>
+							<a href="/dashboard/classes" class="{{ current_route() == 'dashboard/classes' ? 'active' : '' }}">
+								<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+									<path d="M14.2172 3.49965C12.7962 2.83345 11.2037 2.83345 9.78272 3.49965L3.0916 6.63659C2.0156 7.14105 1.73507 8.56352 2.25 9.54666L2.25 14.5C2.25 14.9142 2.58579 15.25 3 15.25C3.41421 15.25 3.75 14.9142 3.75 14.5V10.672L9.78281 13.5003C11.2038 14.1665 12.7963 14.1665 14.2173 13.5003L20.9084 10.3634C22.3639 9.68105 22.3639 7.31899 20.9084 6.63664L14.2172 3.49965Z" fill="#000000"/>
+									<path d="M5 12.9147V16.6254C5 17.6334 5.5035 18.5772 6.38533 19.0656C7.8537 19.8787 10.204 21 12 21C13.796 21 16.1463 19.8787 17.6147 19.0656C18.4965 18.5772 19 17.6334 19 16.6254V12.9148L14.854 14.8585C13.0296 15.7138 10.9705 15.7138 9.14607 14.8585L5 12.9147Z" fill="#000000"/>
+								</svg>
+								<span>
+									{% if session.user.role == 'admin' %}Classes{% else %}Mes Classes
+									{% endif %}
+								</span>
+							</a>
+							{% if session.user.role == 'student' %}
+								<a href="/dashboard/assignments" class="{{ current_route() == 'dashboard/assignments' ? 'active' : '' }}">
+									<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M6.27103 2.11151C5.46135 2.21816 5.03258 2.41324 4.72718 2.71244C4.42179 3.01165 4.22268 3.43172 4.11382 4.225C4.00176 5.04159 4 6.12387 4 7.67568V16.2442C4.38867 15.9781 4.82674 15.7756 5.29899 15.6517C5.82716 15.513 6.44305 15.5132 7.34563 15.5135L20 15.5135V7.67568C20 6.12387 19.9982 5.04159 19.8862 4.22499C19.7773 3.43172 19.5782 3.01165 19.2728 2.71244C18.9674 2.41324 18.5387 2.21816 17.729 2.11151C16.8955 2.00172 15.7908 2 14.2069 2H9.7931C8.2092 2 7.10452 2.00172 6.27103 2.11151ZM6.75862 6.59459C6.75862 6.1468 7.12914 5.78378 7.58621 5.78378H16.4138C16.8709 5.78378 17.2414 6.1468 17.2414 6.59459C17.2414 7.04239 16.8709 7.40541 16.4138 7.40541H7.58621C7.12914 7.40541 6.75862 7.04239 6.75862 6.59459ZM7.58621 9.56757C7.12914 9.56757 6.75862 9.93058 6.75862 10.3784C6.75862 10.8262 7.12914 11.1892 7.58621 11.1892H13.1034C13.5605 11.1892 13.931 10.8262 13.931 10.3784C13.931 9.93058 13.5605 9.56757 13.1034 9.56757H7.58621Z" fill="#000000"/>
+										<path d="M8.68965 17.1351H7.47341C6.39395 17.1351 6.01657 17.1421 5.72738 17.218C4.93365 17.4264 4.30088 18.0044 4.02952 18.7558C4.0463 19.1382 4.07259 19.4746 4.11382 19.775C4.22268 20.5683 4.42179 20.9884 4.72718 21.2876C5.03258 21.5868 5.46135 21.7818 6.27103 21.8885C7.10452 21.9983 8.2092 22 9.7931 22H14.2069C15.7908 22 16.8955 21.9983 17.729 21.8885C18.5387 21.7818 18.9674 21.5868 19.2728 21.2876C19.5782 20.9884 19.7773 20.5683 19.8862 19.775C19.9776 19.1088 19.9956 18.2657 19.9991 17.1351H13.1034V20.1417C13.1034 20.4397 13.1034 20.5886 12.9988 20.6488C12.8941 20.709 12.751 20.6424 12.4647 20.5092L11.0939 19.8713C10.9971 19.8262 10.9486 19.8037 10.8966 19.8037C10.8445 19.8037 10.796 19.8262 10.6992 19.8713L9.32842 20.5092C9.04213 20.6424 8.89899 20.709 8.79432 20.6488C8.68965 20.5886 8.68965 20.4397 8.68965 20.1417V17.1351Z" fill="#000000"/>
+									</svg>
+									<span>
+										Mes Devoirs
+									</span>
+								</a>
+							{% endif %}
+							{% if session.user.role == 'admin' %}
+								<a href="/dashboard/users" class="{{ current_route() == 'dashboard/users' ? 'active' : '' }}">
+									<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M15.5 7.5C15.5 9.433 13.933 11 12 11C10.067 11 8.5 9.433 8.5 7.5C8.5 5.567 10.067 4 12 4C13.933 4 15.5 5.567 15.5 7.5Z" fill="#000000"/>
+										<path d="M18 16.5C18 18.433 15.3137 20 12 20C8.68629 20 6 18.433 6 16.5C6 14.567 8.68629 13 12 13C15.3137 13 18 14.567 18 16.5Z" fill="#000000"/>
+										<path d="M7.12205 5C7.29951 5 7.47276 5.01741 7.64005 5.05056C7.23249 5.77446 7 6.61008 7 7.5C7 8.36825 7.22131 9.18482 7.61059 9.89636C7.45245 9.92583 7.28912 9.94126 7.12205 9.94126C5.70763 9.94126 4.56102 8.83512 4.56102 7.47063C4.56102 6.10614 5.70763 5 7.12205 5Z" fill="#000000"/>
+										<path d="M5.44734 18.986C4.87942 18.3071 4.5 17.474 4.5 16.5C4.5 15.5558 4.85657 14.744 5.39578 14.0767C3.4911 14.2245 2 15.2662 2 16.5294C2 17.8044 3.5173 18.8538 5.44734 18.986Z" fill="#000000"/>
+										<path d="M16.9999 7.5C16.9999 8.36825 16.7786 9.18482 16.3893 9.89636C16.5475 9.92583 16.7108 9.94126 16.8779 9.94126C18.2923 9.94126 19.4389 8.83512 19.4389 7.47063C19.4389 6.10614 18.2923 5 16.8779 5C16.7004 5 16.5272 5.01741 16.3599 5.05056C16.7674 5.77446 16.9999 6.61008 16.9999 7.5Z" fill="#000000"/>
+										<path d="M18.5526 18.986C20.4826 18.8538 21.9999 17.8044 21.9999 16.5294C21.9999 15.2662 20.5088 14.2245 18.6041 14.0767C19.1433 14.744 19.4999 15.5558 19.4999 16.5C19.4999 17.474 19.1205 18.3071 18.5526 18.986Z" fill="#000000"/>
+									</svg>
+									<span>
+										Utilisateurs
+									</span>
+								</a>
+								<a href="/dashboard/files" class="{{ current_route() == 'dashboard/files' ? 'active' : '' }}">
+
+									<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M2 6.94975C2 6.06722 2 5.62595 2.06935 5.25839C2.37464 3.64031 3.64031 2.37464 5.25839 2.06935C5.62595 2 6.06722 2 6.94975 2C7.33642 2 7.52976 2 7.71557 2.01738C8.51665 2.09229 9.27652 2.40704 9.89594 2.92051C10.0396 3.03961 10.1763 3.17633 10.4497 3.44975L11 4C11.8158 4.81578 12.2237 5.22367 12.7121 5.49543C12.9804 5.64471 13.2651 5.7626 13.5604 5.84678C14.0979 6 14.6747 6 15.8284 6H16.2021C18.8345 6 20.1506 6 21.0062 6.76946C21.0849 6.84024 21.1598 6.91514 21.2305 6.99383C22 7.84935 22 9.16554 22 11.7979V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V6.94975Z" fill="#000000"/>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.25 10C12.25 9.58579 12.5858 9.25 13 9.25H18C18.4142 9.25 18.75 9.58579 18.75 10C18.75 10.4142 18.4142 10.75 18 10.75H13C12.5858 10.75 12.25 10.4142 12.25 10Z" fill="white"/>
+										<path d="M16.9856 3.02094C16.8321 3 16.6492 3 16.2835 3H12L12.3699 3.38312C13.0359 4.07299 13.2919 4.33051 13.5877 4.50096C13.7594 4.5999 13.9415 4.67804 14.1304 4.73383C14.4559 4.82993 14.8128 4.83538 15.7546 4.83538L16.089 4.83538C17.0914 4.83536 17.8995 4.83535 18.5389 4.91862C18.6984 4.93939 18.8521 4.96582 19 5C18.8144 3.96313 18.0043 3.15985 16.9856 3.02094Z" fill="#000000"/>
+									</svg>
+									<span>
+										Fichiers
+									</span>
+								</a>
+							{% endif %}
+						</nav>
+					</div>
+					<div class="user-container">
+						<div>
+							<div class="user-circle">
+								{{ session.user.name|replace({' ': ''})|replace({'[^a-zA-Z]': ''})|slice(0, 1) }}
+							</div>
+							<div class="user-details">
+								<h3>
+									{{ session.user.name }}
+								</h3>
+								<p>
+									{% if session.user.role == 'student' %}
+										Etudiant
+									{% elseif session.user.role == 'admin' %}
+										Administrateur
+									{% elseif session.user.role == 'teacher' %}
+										Professeur
+									{% endif %}
+								</p>
+							</div>
+						</div>
+						<div class="button-group">
+							<a href="/logout">
+								<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path fill-rule="evenodd" clip-rule="evenodd" d="M16.125 12C16.125 11.5858 15.7892 11.25 15.375 11.25L4.40244 11.25L6.36309 9.56944C6.67759 9.29988 6.71401 8.8264 6.44444 8.51191C6.17488 8.19741 5.7014 8.16099 5.38691 8.43056L1.88691 11.4306C1.72067 11.573 1.625 11.7811 1.625 12C1.625 12.2189 1.72067 12.427 1.88691 12.5694L5.38691 15.5694C5.7014 15.839 6.17488 15.8026 6.44444 15.4881C6.71401 15.1736 6.67759 14.7001 6.36309 14.4306L4.40244 12.75L15.375 12.75C15.7892 12.75 16.125 12.4142 16.125 12Z" fill="#000000"/>
+									<path d="M9.375 8C9.375 8.70219 9.375 9.05329 9.54351 9.3055C9.61648 9.41471 9.71025 9.50848 9.81946 9.58145C10.0717 9.74996 10.4228 9.74996 11.125 9.74996L15.375 9.74996C16.6176 9.74996 17.625 10.7573 17.625 12C17.625 13.2426 16.6176 14.25 15.375 14.25L11.125 14.25C10.4228 14.25 10.0716 14.25 9.8194 14.4185C9.71023 14.4915 9.6165 14.5852 9.54355 14.6944C9.375 14.9466 9.375 15.2977 9.375 16C9.375 18.8284 9.375 20.2426 10.2537 21.1213C11.1324 22 12.5464 22 15.3748 22L16.3748 22C19.2032 22 20.6174 22 21.4961 21.1213C22.3748 20.2426 22.3748 18.8284 22.3748 16L22.3748 8C22.3748 5.17158 22.3748 3.75736 21.4961 2.87868C20.6174 2 19.2032 2 16.3748 2L15.3748 2C12.5464 2 11.1324 2 10.2537 2.87868C9.375 3.75736 9.375 5.17157 9.375 8Z" fill="#000000"/>
+								</svg>
+							</a>
+							<a href="/dashboard/profile">
+								<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="12" cy="6" r="4" fill="#000000"/>
+									<ellipse cx="12" cy="17" rx="7" ry="4" fill="#000000"/>
+								</svg>
+							</a>
+						</div>
+					</div>
+				</div>
+				{% block content %}{% endblock %}
+			</div>
+		</div>
+	</body>
+	{% block js %}
+		<script src="{{ asset('/js/offcanvas.js') }}"></script>
+	{% endblock %}
+</html>

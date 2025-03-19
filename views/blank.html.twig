@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<!-- global meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta name="keywords" content="livrables, projets, devoirs, dépôt, suivi, étudiants">
+		<meta
+		name="author" content="FileSphere">
+		<!-- social meta tags -->
+		<meta name="robots" content="index, follow">
+		<meta name="googlebot" content="index, follow">
+		<meta
+		name="bingbot" content="index, follow">
+		<!-- facebook and twitter meta tags -->
+		<meta property="og:title" content="File Sphere - Plateforme de dépôt et de suivi de livrables">
+		<meta property="og:description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta property="og:image" content="{{ asset('/images/bg.png') }}">
+		<meta
+		property="og:url" content="https://www.hotelneptune.com">
+		<!-- twitter meta tags -->
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="FileSphere - Plateforme de dépôt et de suivi de livrables">
+		<meta name="twitter:description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
+		<meta name="twitter:image" content="{{ asset('/images/bg.png') }}">
+		{% block css %}
+			<link rel="stylesheet" href="{{ asset('/css/main.css') }}?v={{ random() }}"/>
+		{% endblock %}
+		<title>
+			FileSphere —
+			{% block title %}{% endblock %}
+		</title>
+	</head>
+	<body>
+
+		{% block content %}{% endblock %}
+	</body>
+	{% block js %}{% endblock %}
+</html>

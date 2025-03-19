@@ -1,0 +1,12 @@
+{% extends "blank.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Erreur serveur
+{% endblock %}
+{% block content %}
+	<div class="container-error">
+		<h1>500</h1>
+		<p>Désolé, une erreur serveur est survenue.</p>
+		<a href="/dashboard" class="btn-home">Retour à l'accueil</a>
+	</div>
+{% endblock %}

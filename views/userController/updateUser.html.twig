@@ -1,0 +1,57 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Modifier l'utilisateur
+	{{ user.name }}
+{% endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="app-body-main-content">
+		<section class="page-section">
+			<div class="page-breacrumb">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/users">
+								Utilisateurs
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item active" aria-current="page">
+							Modifier l'utilisateur
+							{{ user.name }}
+						</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="page-header">
+				<h2>
+					Modifier l'utilisateur
+					{{ user.name }}
+				</h2>
+			</div>
+			<div class="update-user">
+				<form action="/dashboard/users/{{ user.id }}/edit" method="POST" class="form">
+					<h1>Information du compte</h1>
+					<div class="form-part">
+						<input type="text" name="name" placeholder="Nom" value="{{ user.name }}">
+					</div>
+					<div class="form-part">
+						<input type="email" name="email" placeholder="Email" value="{{ user.email }}">
+					</div>
+					<div class="form-part">
+						<select name="role">
+							<option value="student" {% if user.role == 'student' %} selected {% endif %}>Etudiant</option>
+							<option value="teacher" {% if user.role == 'teacher' %} selected {% endif %}>Professeur</option>
+							<option value="admin" {% if user.role == 'admin' %} selected {% endif %}>Administrateur</option>
+						</select>
+					</div>
+					<button type="submit">Modifier</button>
+				</form>
+			</div>
+
+		</section>
+	</div>
+{% endblock %}

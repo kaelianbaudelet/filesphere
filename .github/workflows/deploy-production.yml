@@ -1,0 +1,54 @@
+name: CI/CD PHP Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    name: Test de qualité du code PHP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Mise en place de PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer, phpstan, phpcs
+
+      - name: Installation des dépendances
+        run: composer install --no-progress --no-suggest --prefer-dist
+
+      - name: Analyse du code avec PHPStan
+        run: phpstan analyse src --level=max
+
+      - name: Analyse du code avec PHPCS (PSR12)
+        run: phpcs --standard=PSR12 src/
+
+  deploy:
+    name: Déploiement de l'application sur le serveur VPS
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Configuration de l'accès SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Déploiement de l'application
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /var/www/hotelneptune
+            git pull origin main
+            docker-compose up -d --build
+          EOF

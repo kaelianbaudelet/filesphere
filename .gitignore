@@ -1,0 +1,27 @@
+# Ignore .env file
+.env
+
+# Ignore log files (Apache)
+logs/
+
+# Ignore node_modules directory (NPM dependencies)
+node_modules/
+
+# Ignore vendor directory (Composer dependencies)
+vendor/
+
+# Ignore IDE and editor specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore PHPUnit result cache
+.phpunit.result.cache
+
+# Ignore Composer lock file
+composer.lock

@@ -1,0 +1,102 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Editer
+	{{ assignment.name }}
+	dans
+	{{ class.name }}
+{% endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="app-body-main-content">
+		<section class="page-section">
+			<div class="page-breacrumb">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/classes">
+								{% if session.user.role == 'admin' %}Classes{% else %}Mes Classes
+								{% endif %}
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item">
+							{{ class.name }}
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item">
+							<a href="/dashboard/classes/{{ class.id }}/sections">
+								Sections
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item">
+							{{ section.name }}
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item active">
+							<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments">
+								Devoirs
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item active" aria-current="page">
+							Modifier le devoir
+							{{ assignment.name }}
+						</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="page-header">
+				<h2>
+					Modifier le devoir
+					{{ assignment.name }}
+					dans
+					{{ class.name }}
+				</h2>
+			</div>
+			<div class="update-user">
+				<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/edit" method="POST" class="form">
+					<h1>Information du devoir</h1>
+					<div class="form-part">
+						<label for="name">Nom du devoir</label>
+						<input type="text" name="name" placeholder="Nom du devoir" value="{{ assignment.name }}">
+					</div>
+					<div class="form-part">
+						<label for="description">Description du devoir</label>
+						<textarea name="description" placeholder="Description du devoir" style="resize: vertical;">{{ assignment.description }}</textarea>
+					</div>
+					<div class="form-part">
+						<label for="start_period">Date de début</label>
+						<input type="datetime-local" name="start_period" id="start_period" value="{{ assignment.startPeriod|date('Y-m-d\\TH:i') }}">
+					</div>
+					<div class="form-part">
+						<label for="end_period">Date de fin</label>
+						<input type="datetime-local" name="end_period" id="end_period" value="{{ assignment.endPeriod|date('Y-m-d\\TH:i') }}">
+					</div>
+					<div class="form-part">
+						<label for="max_files">Nombre de fichiers autorisés</label>
+						<input type="number" name="max_files" id="max_files" placeholder="Nombre de fichiers autorisés" min="1" max="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" value="1">
+					</div>
+					<div class="form-part">
+						<label style="display: flex; align-items: center; gap: 10px;">
+							<input type="checkbox" name="allow_late_submission" id="allow_late_submission" {% if assignment.allowLateSubmission == 1 %} checked {% endif %}>
+							Autoriser les soumissions en retard
+						</label>
+					</div>
+					<button type="submit">Modifier</button>
+				</form>
+			</div>
+		</section>
+	</div>
+{% endblock %}

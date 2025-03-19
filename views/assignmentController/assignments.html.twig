@@ -1,0 +1,18 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Devoirs
+{% endblock %}
+{% do clear_session_alert() %}
+{% block content %}
+	<div class="app-body-main-content">
+		<section class="page-classes">
+			<div class="page-header">
+				<h2>
+					Devoirs
+				</h2>
+			</div>
+			{{dump(assignments)}}
+		</section>
+	</div>
+{% endblock %}

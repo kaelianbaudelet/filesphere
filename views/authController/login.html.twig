@@ -1,0 +1,38 @@
+{% extends "blank.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Connexion
+{%
+endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="auth-container">
+		<div class="auth-form">
+			<img src="assets/images/logo.svg" alt="Logo" class="logo-mobile">
+			<form action="#" method="POST">
+				<h2>Se connecter</h2>
+				{% if session.alert %}
+					<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}">
+						{{ session.alert.message }}
+					</p>
+				{% endif %}
+				<div class="input-group">
+					<label for="email">Email</label>
+					<input type="email" id="email" name="email" placeholder="Email" required>
+				</div>
+				<div class="input-group">
+					<label for="password">Mot de passe</label>
+					<input type="password" id="password" name="password" placeholder="Mot de passe" required>
+				</div>
+				<a href="/resetpassword" class="sub-link">Mot de passe oublié ?</a>
+				<button type="submit" class="btn">Connexion</button>
+			</form>
+			<p class="copy-right">© FileSphere 2025 — Tous droits réservés</p>
+		</div>
+		<div class="logo">
+			<img src="assets/images/logo.svg" alt="Logo">
+		</div>
+	</div>
+
+
+{% endblock %}

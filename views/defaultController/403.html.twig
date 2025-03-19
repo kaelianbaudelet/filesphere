@@ -1,0 +1,12 @@
+{% extends "blank.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Accès refusé
+{% endblock %}
+{% block content %}
+	<div class="container-error">
+		<h1>403</h1>
+		<p>Désolé, vous n'avez pas l'autorisation d'accéder à cette page.</p>
+		<a href="/dashboard" class="btn-home">Retour à l'accueil</a>
+	</div>
+{% endblock %}

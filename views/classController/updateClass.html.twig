@@ -1,0 +1,57 @@
+{% extends "dashboard.html.twig" %}
+{% block title %}
+	{{ parent() }}
+	Modifier la classe
+	{{ class.name }}
+{% endblock %}
+{% block content %}
+	{% do clear_session_alert() %}
+	<div class="app-body-main-content">
+		<section class="page-section">
+			<div class="page-breacrumb">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/classes">
+								Classes
+							</a>
+							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</li>
+						<li class="breadcrumb-item active" aria-current="page">
+							Modifier la classe
+							{{ class.name }}
+
+						</li>
+					</ol>
+				</nav>
+			</div>
+			<div class="page-header">
+				<h2>
+					Modifier la classe
+					{{ class.name }}
+				</h2>
+			</div>
+			<div class="update-user">
+				<form action="/dashboard/classes/{{ class.id }}/edit" method="POST" class="form">
+					<h1>Information de la classe</h1>
+					<div class="form-part">
+						<label for="name">Nom de la classe</label>
+						<input type="text" name="name" placeholder="Nom de la classe" value="{{ class.name }}">
+					</div>
+					<div class="form-part">
+						<label for="teacher">Professeur</label>
+						<select name="teacher" id="teacher">
+							{% for teacher in teachers %}
+								<option value="{{ teacher.id }}" {% if teacher.id == class.teacher.id %} selected {% endif %}>{{ teacher.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<button type="submit">Modifier</button>
+				</form>
+			</div>
+
+		</section>
+	</div>
+{% endblock %}
