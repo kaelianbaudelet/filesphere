@@ -103,8 +103,9 @@ class FileController
         exit;
     }
 
-    public function deleteFile()
+    public function deleteFile(string $fileId)
     {
+
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
             exit;
@@ -115,15 +116,7 @@ class FileController
             exit;
         }
 
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            $_SESSION['alert'] = ['status' => 'error', 'message' => 'File ID is required.'];
-            header('Location: /dashboard/files');
-            exit;
-        }
-
-        $file = $this->fileModel->getFileById($id);
+        $file = $this->fileModel->getFileById($fileId);
 
         if (!$file) {
             $_SESSION['alert'] = ['status' => 'error', 'message' => 'File not found.'];
@@ -137,7 +130,7 @@ class FileController
                 unlink($filePath);
             }
 
-            $this->fileModel->deleteFile($id);
+            $this->fileModel->deleteFile($fileId);
         } catch (\Exception $e) {
             $_SESSION['alert'] = ['status' => 'error', 'message' => 'Failed to delete file.'];
             header('Location: /dashboard/files');
@@ -149,7 +142,7 @@ class FileController
         exit;
     }
 
-    public function downloadFile()
+    public function downloadFile($fileId)
     {
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
@@ -161,15 +154,7 @@ class FileController
             exit;
         }
 
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            $_SESSION['alert'] = ['status' => 'error', 'message' => 'File ID is required.'];
-            header('Location: /dashboard/files');
-            exit;
-        }
-
-        $file = $this->fileModel->getFileById($id);
+        $file = $this->fileModel->getFileById($fileId);
 
         if (!$file) {
             $_SESSION['alert'] = ['status' => 'error', 'message' => 'File not found.'];

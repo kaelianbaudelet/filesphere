@@ -12,7 +12,7 @@ class File
     private ?string $token = null;
     private string $name;
     private ?string $extension = null;
-    private float $size;
+    private int $size;
     private ?User $owner;
     private ?\DateTime $createdAt;
     private ?\DateTime $updatedAt;
@@ -22,7 +22,7 @@ class File
         ?string $token,
         string $name,
         ?string $extension,
-        float $size,
+        int $size,
         User $owner,
         ?\DateTime $createdAt,
         ?\DateTime $updatedAt
@@ -82,7 +82,7 @@ class File
         return $this->size;
     }
 
-    public function setSize(float $size): void
+    public function setSize(int $size): void
     {
         $this->size = $size;
     }

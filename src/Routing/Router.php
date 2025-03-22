@@ -29,27 +29,19 @@ class Router
         $this->pageMappings = [
             '' => [DefaultController::class, 'home'],
 
-            // Erreur
-
             '403' => [DefaultController::class, 'error403'],
             '404' => [DefaultController::class, 'error404'],
             '500' => [DefaultController::class, 'error500'],
-
-            // Auth
 
             'login' => [AuthController::class, 'login'],
             'register' => [AuthController::class, 'tempregister'],
             'logout' => [AuthController::class, 'logout'],
             'resetpassword' => [AuthController::class, 'resetPassword'],
 
-            // Dashboard
-
             'dashboard' => [DashboardController::class, 'dashboard'],
             'dashboard/profile' => [DashboardController::class, 'profile'],
             'dashboard/profile/edit' => [DashboardController::class, 'updateProfile'],
             'dashboard/profile/editpassword' => [DashboardController::class, 'updatePassword'],
-
-            // Gestion des utilisateurs
 
             'dashboard/users' => [UserController::class, 'users'],
             'dashboard/users/create' => [UserController::class, 'createUser'],
@@ -57,18 +49,12 @@ class Router
             'dashboard/users/{user}/delete' => [UserController::class, 'deleteUser'],
             'dashboard/users/{user}/resetpassword' => [UserController::class, 'resetPassword'],
 
-            // Gestion des fichiers du site
-
             'dashboard/files' => [FileController::class, 'files'],
             'dashboard/files/upload' => [FileController::class, 'uploadFile'],
             'dashboard/files/{file}/download' => [FileController::class, 'downloadFile'],
             'dashboard/files/{file}/delete' => [FileController::class, 'deleteFile'],
 
-            // Affichage des devoirs
-
             'dashboard/assignments' => [AssignmentController::class, 'assignments'],
-
-            // Gestion des classes
 
             'dashboard/classes' => [SchoolClassController::class, 'classes'],
             'dashboard/classes/create' => [SchoolClassController::class, 'createClass'],
@@ -91,11 +77,12 @@ class Router
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/delete' => [SchoolClassController::class, 'deleteAssignment'],
 
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions' => [SchoolClassController::class, 'submissions'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/cancel' => [SchoolClassController::class, 'cancelAssignment'],
+
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submit' => [SchoolClassController::class, 'submitAssignment'],
 
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions/cancel' => [SchoolClassController::class, 'cancelSubmission'],
+
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/download' => [SchoolClassController::class, 'downloadFile'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/delete' => [SchoolClassController::class, 'deleteFile'],
         ];
 
         $this->defaultPage = '';
@@ -113,17 +100,16 @@ class Router
         $this->currentRoute = $requestedPage;
         $params = [];
 
-        // Vérifier si la route demandée correspond à un pattern dynamique
         foreach ($this->pageMappings as $routePattern => $controllerInfo) {
             if (!is_string($routePattern)) {
-                continue; // Ignore les clés non valides
+                continue;
             }
 
             $regexPattern = preg_replace('/\{[^\/]+\}/', '([^\/]+)', $routePattern);
             $regexPattern = "#^" . $regexPattern . "$#";
 
             if (preg_match($regexPattern, $requestedPage, $matches)) {
-                array_shift($matches); // Supprime l'URL complète capturée
+                array_shift($matches);
                 $params = $matches;
                 [$controllerClass, $method] = $controllerInfo;
 
@@ -135,7 +121,6 @@ class Router
             }
         }
 
-        // Si aucune correspondance trouvée, afficher l'erreur 404
         $error404Info = $this->pageMappings[$this->errorPage];
         [$errorControllerClass, $errorMethod] = $error404Info;
         $errorController = new $errorControllerClass($twig, $this->dependencyContainer);

@@ -86,7 +86,7 @@ class SchoolClassModel
         }
     }
 
-    public function uploadFilesAndAddToAssignment(array $files, string $assignmentId, string $userId): bool
+    public function uploadFilesAndAddToAssignment(array $files, Assignment $assignment, User $user): bool
     {
         try {
             $this->db->beginTransaction();
@@ -104,9 +104,6 @@ class SchoolClassModel
 
             // Parcourir chaque fichier
             for ($i = 0; $i < $fileCount; $i++) {
-                if ($files['error'][$i] !== UPLOAD_ERR_OK) {
-                    continue; // Ignorer les fichiers avec erreur
-                }
 
                 $token = bin2hex(random_bytes(16));
                 $fileName = $files['name'][$i];
@@ -117,7 +114,7 @@ class SchoolClassModel
                 $stmtFile->bindValue(':token', $token);
                 $stmtFile->bindValue(':extension', $extension);
                 $stmtFile->bindValue(':size', $files['size'][$i]);
-                $stmtFile->bindValue(':user_id', $userId);
+                $stmtFile->bindValue(':user_id', $user->getId());
 
                 $stmtFile->execute();
 
@@ -143,13 +140,12 @@ class SchoolClassModel
 
             // Ajouter les relations assignmentFile
             if (!empty($fileIds)) {
-                $sqlAssignmentFile = "INSERT INTO AssignmentFile (assignment_id, file_id, user_id) VALUES (:assignment_id, :file_id, :user_id)";
+                $sqlAssignmentFile = "INSERT INTO AssignmentFile (assignment_id, file_id) VALUES (:assignment_id, :file_id)";
                 $stmtAssignmentFile = $this->db->prepare($sqlAssignmentFile);
 
                 foreach ($fileIds as $fileId) {
-                    $stmtAssignmentFile->bindValue(':assignment_id', $assignmentId);
+                    $stmtAssignmentFile->bindValue(':assignment_id', $assignment->getId());
                     $stmtAssignmentFile->bindValue(':file_id', $fileId);
-                    $stmtAssignmentFile->bindValue(':user_id', $userId);
                     $stmtAssignmentFile->execute();
                 }
             }
@@ -161,6 +157,62 @@ class SchoolClassModel
             // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de l'envoi des fichiers : " . $e->getMessage());
+        }
+    }
+
+    //deleteAssignmentFilesByUserId (en gros on delete un ou plusieurs ficheir qui sotn dans AssignmentFiles qui sont lié a un user)
+    public function deleteAssignmentFilesByUserId($assignment, $user): bool
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Get the files to delete (including token and extension for file deletion)
+            $sqlGetFiles = "SELECT f.id, f.token, f.extension FROM File f
+                            JOIN AssignmentFile af ON f.id = af.file_id
+                            WHERE f.user_id = :user_id AND af.assignment_id = :assignment_id";
+            $stmtGetFiles = $this->db->prepare($sqlGetFiles);
+            $stmtGetFiles->bindValue(':user_id', $user->getId());
+            $stmtGetFiles->bindValue(':assignment_id', $assignment->getId());
+            $stmtGetFiles->execute();
+            $files = $stmtGetFiles->fetchAll(PDO::FETCH_ASSOC);
+
+            // Extract just the IDs for the database operations
+            $fileIds = array_column($files, 'id');
+
+            // Delete physical files from the filesystem
+            $uploadDir = __DIR__ . '/../../public/assets/upload/';
+            foreach ($files as $file) {
+                $filePath = $uploadDir . $file['token'] . '.' . $file['extension'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            // Delete the AssignmentFile relations
+            $sqlDeleteAssignmentFile = "DELETE FROM AssignmentFile
+                                       WHERE assignment_id = :assignment_id
+                                       AND file_id IN (SELECT id FROM File WHERE user_id = :user_id)";
+            $stmtDeleteAssignmentFile = $this->db->prepare($sqlDeleteAssignmentFile);
+            $stmtDeleteAssignmentFile->bindValue(':user_id', $user->getId());
+            $stmtDeleteAssignmentFile->bindValue(':assignment_id', $assignment->getId());
+            $stmtDeleteAssignmentFile->execute();
+
+            // Delete the File records
+            if (!empty($fileIds)) {
+                $placeholders = implode(',', array_fill(0, count($fileIds), '?'));
+                $sqlDeleteFile = "DELETE FROM File WHERE id IN ($placeholders)";
+                $stmtDeleteFile = $this->db->prepare($sqlDeleteFile);
+                foreach ($fileIds as $i => $fileId) {
+                    $stmtDeleteFile->bindValue($i + 1, $fileId);
+                }
+                $stmtDeleteFile->execute();
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw new Exception("Error deleting assignment files: " . $e->getMessage());
         }
     }
 
@@ -186,33 +238,6 @@ class SchoolClassModel
             new \DateTime($row['created_at']),
             new \DateTime($row['updated_at'])
         );
-    }
-
-    //deleteFile
-
-    public function deleteFile(string $fileId): bool
-    {
-        try {
-            $this->db->beginTransaction();
-
-            // Supprimer d'abord les relations devoir-fichier
-            $sql = "DELETE FROM AssignmentFile WHERE file_id = :file_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':file_id', $fileId);
-            $stmt->execute();
-
-            // Supprimer ensuite le fichier
-            $sql = "DELETE FROM File WHERE id = :file_id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':file_id', $fileId);
-            $stmt->execute();
-
-            $this->db->commit();
-            return true;
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            throw new Exception("Erreur lors de la suppression du fichier : " . $e->getMessage());
-        }
     }
 
 
@@ -478,9 +503,9 @@ class SchoolClassModel
     }
 
 
-    public function getFilesByAssignmentId(string $assignmentId, string $userId): array
+    public function getFilesByAssignmentId(string $assignmentId, User $user): array
     {
-        $user = $this->getUserById($userId);
+        $user = $this->getUserById($user->getId());
 
         if ($user->getRole() === 'admin' || $user->getRole() === 'teacher') {
             $sql = "SELECT f.* FROM File f
@@ -498,7 +523,7 @@ class SchoolClassModel
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':assignment_id', $assignmentId);
         if ($user->getRole() !== 'admin' && $user->getRole() !== 'teacher') {
-            $stmt->bindValue(':user_id', $userId);
+            $stmt->bindValue(':user_id', $user->getId());
         }
         $stmt->execute();
 
@@ -798,7 +823,7 @@ class SchoolClassModel
     }
 
     //getassignmentById
-    public function getAssignmentById(string $id, string $userId): ?assignment
+    public function getAssignmentById(string $id, User $user): ?assignment
     {
         $sql = "SELECT * FROM Assignment WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -822,7 +847,7 @@ class SchoolClassModel
             new \DateTime($row['updated_at'])
         );
 
-        $files = $this->getFilesByAssignmentId($row['id'], $userId);
+        $files = $this->getFilesByAssignmentId($row['id'], $user);
         foreach ($files as $file) {
             $assignment->addFile($file);
         }
@@ -840,14 +865,12 @@ class SchoolClassModel
         try {
             $this->db->beginTransaction();
 
-            // Supprimer la relation ClassSection
             $sql = "DELETE FROM ClassSection WHERE class_id = :class_id AND section_id = :section_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':class_id', $classId);
             $stmt->bindValue(':section_id', $sectionId);
             $stmt->execute();
 
-            // Supprimer la section
             $sql = "DELETE FROM Section WHERE id = :section_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':section_id', $sectionId);

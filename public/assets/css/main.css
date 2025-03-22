@@ -918,8 +918,14 @@ input[type="file"] {
     display: flex;
     margin-top: 8px;
     align-items: center;
-    justify-content: space-between;
+}
+
+.navigation-header-container {
+    display: flex;
+    align-items: center;
     gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .navigation-header a {
@@ -1753,9 +1759,6 @@ input[type="file"] {
     margin-bottom: 1.25rem;
 }
 
-.page-breacrumb {
-    margin-bottom: 28px;
-}
 .page-breacrumb .breadcrumb {
     background-color: transparent;
     padding: 0;
@@ -1992,7 +1995,7 @@ input[type="file"] {
 }
 
 .assignment-card-header-content h1 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 500;
 }
 
@@ -2024,6 +2027,10 @@ input[type="file"] {
     border: 1px solid #ddd;
     border-radius: 8px;
     transition: background-color 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    gap: 10px;
 }
 
 .assignment-card-instructions-files li:hover {
@@ -2032,6 +2039,9 @@ input[type="file"] {
 .assignment-card-instructions-files li p {
     margin: 0;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .assignment-card-instructions-files a {
     color: #37b7d5;

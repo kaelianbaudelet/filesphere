@@ -14,11 +14,13 @@ class AssignmentController
 {
     private $twig;
     private $assignmentModel;
+    private $userModel;
 
     public function __construct(Environment $twig, DependencyContainer $dependencyContainer)
     {
         $this->twig = $twig;
         $this->assignmentModel = $dependencyContainer->get('AssignmentModel');
+        $this->userModel = $dependencyContainer->get('UserModel');
     }
 
     public function assignments()
@@ -28,8 +30,14 @@ class AssignmentController
             exit;
         }
 
-        $assignments = $this->assignmentModel->getAllAssignments($_SESSION['user']['id']);
+        $user = $this->userModel->getUserById($_SESSION['user']['id']);
+        if ($user->getRole() !== 'student') {
+            echo $this->twig->render('defaultController/403.html.twig');
+            exit;
+        }
 
-        echo $this->twig->render('assignmentController/assignments.html.twig', ['assignments' => $assignments]);
+        $studentAssignments = $this->assignmentModel->getAllAssignments($user);
+
+        echo $this->twig->render('assignmentController/assignments.html.twig', ['studentAssignments' => $studentAssignments]);
     }
 }

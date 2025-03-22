@@ -158,7 +158,17 @@ class SchoolClassController
             exit;
         }
 
-        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $_SESSION['user']['id']);
+        $user = $this->userModel->getUserById($_SESSION['user']['id']);
+        if (!$user) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Utilisateur non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user);
 
         if (!$assignment) {
             $_SESSION['alert'] = [
@@ -217,6 +227,7 @@ class SchoolClassController
         ]);
     }
 
+
     public function submissions(string $class_id, string $section_id, string $assignment_id)
     {
 
@@ -224,8 +235,6 @@ class SchoolClassController
             header('Location: /login');
             exit;
         }
-
-
 
         if (!$class_id || !$section_id || !$assignment_id) {
             $_SESSION['alert'] = [
@@ -256,7 +265,17 @@ class SchoolClassController
             exit;
         }
 
-        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $_SESSION['user']['id']);
+        $user = $this->userModel->getUserById($_SESSION['user']['id']);
+        if (!$user) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Utilisateur non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user);
         if (!$assignment) {
             $_SESSION['alert'] = [
                 'status' => 'error',
@@ -273,6 +292,181 @@ class SchoolClassController
         ]);
     }
 
+    public function submitAssignment(string $class_id, string $section_id, string $assignment_id)
+    {
+
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $user = $_SESSION['user'] ?? null;
+
+        if (!$class_id || !$section_id || !$assignment_id || !$user) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'ID de classe, de section ou de devoir manquant.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $class = $this->schoolClassModel->getClassById($class_id);
+        if (!$class) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Classe non trouvée.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $section = $this->schoolClassModel->getSectionById($section_id);
+        if (!$section) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Section non trouvée.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $user = $this->userModel->getUserById($user['id']);
+        if (!$user) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Utilisateur non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user);
+        if (!$assignment) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Devoir non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
+        $files = $_FILES['files'] ?? null;
+
+        if (!$files) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Fichiers requis.',
+                'context' => 'modal',
+            ];
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
+        if ($assignment->getStartPeriod() > new \DateTime() || $assignment->getEndPeriod() < new \DateTime()) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Le devoir est terminé ou n\'a pas encore commencé. Vous ne pouvez pas télécharger de fichiers.',
+                'context' => 'modal',
+            ];
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
+        $files = $this->schoolClassModel->uploadFilesAndAddToAssignment($files, $assignment, $user);
+
+        if ($files) {
+            $_SESSION['alert'] = [
+                'status' => 'success',
+                'message' => 'Fichiers téléchargés avec succès.',
+                'submitted' => true,
+
+            ];
+
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submitted");
+            exit;
+        } else {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Erreur lors du téléchargement des fichiers.',
+                'context' => 'modal',
+            ];
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
+        header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submitted");
+        exit;
+    }
+
+    public function cancelSubmission(string $class_id, string $section_id, string $assignment_id)
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        // on verif que les param (slug) sont bien là
+        $class = $this->schoolClassModel->getClassById($class_id);
+        if (!$class) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Classe non trouvée.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $section = $this->schoolClassModel->getSectionById($section_id);
+        if (!$section) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Section non trouvée.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        if (!isset($_POST['user_id'])) {
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details");
+            exit;
+        }
+        $user = $this->userModel->getUserById($_POST['user_id']);
+        if (!$user) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Utilisateur non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user);
+        if (!$assignment) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Devoir non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $this->schoolClassModel->deleteAssignmentFilesByUserId($assignment, $user);
+
+        $_SESSION['alert'] = [
+            'status' => 'success',
+            'message' => 'Fichier supprimé avec succès.',
+        ];
+
+        header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details");
+        exit;
+    }
+
     public function downloadFile(string $class_id, string $section_id, string $assignment_id, string $file_id)
     {
 
@@ -281,10 +475,10 @@ class SchoolClassController
             exit;
         }
 
-        if (!$file_id) {
+        if (!$class_id || !$section_id || !$assignment_id || !$file_id) {
             $_SESSION['alert'] = [
                 'status' => 'error',
-                'message' => 'ID de fichier manquant.',
+                'message' => 'ID de classe, de section, de devoir ou de fichier manquant.',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -336,108 +530,6 @@ class SchoolClassController
         exit;
     }
 
-    //deleteFile() method
-    public function deleteFile()
-    {
-
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $class_id = $_POST['class_id'] ?? null;
-        $section_id = $_POST['section_id'] ?? null;
-        $assignment_id = $_POST['assignment_id'] ?? null;
-        $file_id = $_POST['file_id'] ?? null;
-
-        if (!$class_id || !$section_id || !$assignment_id || !$file_id) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'ID de classe, de section, de devoir ou de fichier manquant.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $class = $this->schoolClassModel->getClassById($class_id);
-        if (!$class) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Classe non trouvée.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $section = $this->schoolClassModel->getSectionById($section_id);
-        if (!$section) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Section non trouvée.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $_SESSION['user']['id']);
-        if (!$assignment) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Devoir non trouvé.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $file = $this->schoolClassModel->getFileById($file_id);
-        if (!$file) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Fichier non trouvé.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        if ($_SESSION['user']['role'] == 'student' && $file->getOwner()->getId() != $_SESSION['user']['id']) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Vous n\'avez pas le droit de supprimer ce fichier.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-
-        try {
-            $uploadDir = __DIR__ . '/../../public/assets/upload/';
-            $filePath = $uploadDir . $file->getToken() . '.' . $file->getExtension();
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
-            $this->schoolClassModel->deleteFile($file_id);
-            $_SESSION['alert'] = [
-                'status' => 'success',
-                'message' => 'Fichier supprimé avec succès.',
-            ];
-        } catch (\Exception $e) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Erreur lors de la suppression du fichier.',
-            ];
-        }
-
-        header("Location: /dashboard/class/section/assignment/files?class_id=$class_id&section_id=$section_id&assignment_id=$assignment_id");
-        exit;
-    }
-
-
-    // createassignment() method
     public function createAssignment(string $class_id, string $section_id)
     {
         if (!isset($_SESSION['user'])) {
@@ -549,103 +641,6 @@ class SchoolClassController
         }
 
         header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments");
-        exit;
-    }
-
-    //uploadfiles() method
-    public function submitAssignment(string $class_id, string $section_id, string $assignment_id)
-    {
-
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit;
-        }
-
-        $user = $_SESSION['user'] ?? null;
-
-        if (!$class_id || !$section_id || !$assignment_id || !$user) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'ID de classe, de section ou de devoir manquant.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $class = $this->schoolClassModel->getClassById($class_id);
-        if (!$class) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Classe non trouvée.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $section = $this->schoolClassModel->getSectionById($section_id);
-        if (!$section) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Section non trouvée.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user['id']);
-        if (!$assignment) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Devoir non trouvé.',
-            ];
-            header('Location: /dashboard/classes');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo $this->twig->render('classController/uploadFiles.html.twig', [
-                'class' => $class,
-                'section' => $section,
-                'assignment' => $assignment
-            ]);
-            return;
-        }
-
-        $files = $_FILES['files'] ?? null;
-
-        if (!$files) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Fichiers requis.',
-            ];
-            header("Location: /dashboard/class/section/assignment/files?class_id=$class_id&section_id=$section_id&assignment_id=$assignment_id");
-            exit;
-        }
-
-        if ($assignment->getStartPeriod() > new \DateTime() || $assignment->getEndPeriod() < new \DateTime()) {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Le devoir est terminé ou n\'a pas encore commencé. Vous ne pouvez pas télécharger de fichiers.',
-            ];
-            header("Location: /dashboard/class/section/assignment/files?class_id=$class_id&section_id=$section_id&assignment_id=$assignment_id");
-            exit;
-        }
-
-        $files = $this->schoolClassModel->uploadFilesAndAddToAssignment($files, $assignment_id, $user['id']);
-
-        if ($files) {
-            $_SESSION['alert'] = [
-                'status' => 'success',
-                'message' => 'Fichiers téléchargés avec succès.',
-            ];
-        } else {
-            $_SESSION['alert'] = [
-                'status' => 'error',
-                'message' => 'Erreur lors du téléchargement des fichiers.',
-            ];
-        }
-
-        header("Location: /dashboard/class/section/assignment/files?class_id=$class_id&section_id=$section_id&assignment_id=$assignment_id");
         exit;
     }
 
@@ -828,7 +823,18 @@ class SchoolClassController
 
         // Affichage du formulaire pour l'édition
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $_SESSION['user']['id']);
+
+            $user = $this->userModel->getUserById($_SESSION['user']['id']);
+            if (!$user) {
+                $_SESSION['alert'] = [
+                    'status' => 'error',
+                    'message' => 'Utilisateur non trouvé.',
+                ];
+                header('Location: /dashboard/classes');
+                exit;
+            }
+
+            $assignment = $this->schoolClassModel->getAssignmentById($assignment_id, $user);
             if (!$assignment) {
                 $_SESSION['alert'] = [
                     'status' => 'error',

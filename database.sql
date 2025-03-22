@@ -1,5 +1,8 @@
+-- Suppression des tables si elles existent
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS AssignmentInstructionFile;
 DROP TABLE IF EXISTS AssignmentFile;
-DROP TABLE IF EXISTS Sectionassignment;
+DROP TABLE IF EXISTS SectionAssignment;
 DROP TABLE IF EXISTS ClassSection;
 DROP TABLE IF EXISTS ClassStudent;
 DROP TABLE IF EXISTS Assignment;
@@ -7,6 +10,7 @@ DROP TABLE IF EXISTS Section;
 DROP TABLE IF EXISTS Class;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS File;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- Création de la table User
 CREATE TABLE User (
@@ -28,7 +32,7 @@ CREATE TABLE File (
     token VARCHAR(255) UNIQUE,
     name VARCHAR(255) NOT NULL,
     extension VARCHAR(10),
-    size FLOAT NOT NULL,
+    size INT NOT NULL,
     user_id CHAR(36) NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

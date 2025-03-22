@@ -7,63 +7,78 @@
 {% block content %}
 	{% do clear_session_alert() %}
 	<div class="app-body-main-content">
-		<section class="page-section">
-			<div class="page-breacrumb">
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb">
-						<li class="breadcrumb-item">
-							<a href="/dashboard/classes">
-								{% if session.user.role == 'admin' %}Classes{% else %}Mes Classes
-								{% endif %}
-							</a>
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item">
-							{{ class.name }}
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item">
-							<a href="/dashboard/classes/{{ class.id }}/sections">
-								Sections
-							</a>
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item">
-							{{ section.name }}
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item">
-							<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments">
-								Devoirs
-							</a>
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item active" aria-current="page">
-							{{ assignment.name }}
-						</li>
-					</ol>
-				</nav>
+		<section>
+			<div class="page-header-container">
+				<button id="toggle-navigation" class="toggle-navigation">
+					<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 6C4 5.44772 4.44772 5 5 5H19C19.5523 5 20 5.44772 20 6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6Z" fill="#000000"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z" fill="#000000"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M5 17C4.44772 17 4 17.4477 4 18C4 18.5523 4.44772 19 5 19H19C19.5523 19 20 18.5523 20 18C20 17.4477 19.5523 17 19 17H5Z" fill="#000000"></path>
+					</svg>
+				</button>
+				<div class="page-breacrumb">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<a href="/dashboard/classes">
+									{% if session.user.role == 'admin' %}Classes{% else %}Mes Classes
+									{% endif %}
+								</a>
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item">
+								{{ class.name }}
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item">
+								<a href="/dashboard/classes/{{ class.id }}/sections">
+									Sections
+								</a>
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item">
+								{{ section.name }}
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item">
+								<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments">
+									Devoirs
+								</a>
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item active" aria-current="page">
+								{{ assignment.name }}
+							</li>
+						</ol>
+					</nav>
+				</div>
 			</div>
+
 			<div class="overlay" id="submit">
 				<a href="#" class="overlay-content" href="#"></a>
 				<div class="popup" style="max-height: 80vh; overflow-y: auto;">
 					<a href="#" class="close-btn">&times;</a>
 					<h1>Soumettre votre devoir</h1>
 					<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/submit" method="POST" enctype="multipart/form-data">
+						{% if session.alert and session.alert.context == 'modal' %}
+							<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+								{{ session.alert.message }}
+							</p>
+						{% endif %}
 						<div class="form-part">
 							<label for="file">Fichiers</label>
 							<label class="file-input" id="drop-area" for="file">
-								<input type="file" name="instruction_files[]" id="file" accept=".jpg,.jpeg,.png,.gif,.zip,.rar,.7z,.tar,.gz,.txt,.ppt,.pptx,.doc,.docx,.pdf" multiple>
+								<input type="file" name="files[]" id="file" accept=".jpg,.jpeg,.png,.gif,.zip,.rar,.7z,.tar,.gz,.txt,.ppt,.pptx,.doc,.docx,.pdf" multiple>
 								<p>Sélectionner ou glisser-déposer les fichiers ici.</p>
 								<p>Vous pouvez téléverser jusqu'à 10 fichiers maximum.</p>
 								<p id="file-info">
@@ -77,12 +92,576 @@
 					</form>
 				</div>
 			</div>
+			{% if session.alert and session.alert.submitted %}
+				<div class="overlay" id="submitted">
+					<a href="#" class="overlay-contejnt" href="#"></a>
+					<div class="popup" style="max-height: 80vh; overflow-y: auto; height: 50vh; width: 50vh; box-shadow: none; justify-content: center; align-items: center; display: flex; border-radius: 30px; border: 1px solid #ccc;">
+
+						<svg height="300" id="evbRyzWcuwN1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="-20 -60 300 350" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="1686b634d506408598b920f325093177" export-id="c6c896df55b64f338c0cf2d7ab8caa5c" cached="true">
+							<style>
+
+								@keyframes hideAfterDelay {
+									0% {
+										opacity: 1;
+									}
+									99% {
+										opacity: 1; /* Stay fully visible until the very end */
+									}
+									100% {
+										opacity: 0; /* Disappear instantly */
+										display: none;
+									}
+								}
+
+								#submitted {
+									animation: hideAfterDelay 3.8s forwards;
+								}
+
+								/* Default state - no animations running */
+								#evbRyzWcuwN2_to,
+								#evbRyzWcuwN2_tr,
+								#evbRyzWcuwN2_ts,
+								#evbRyzWcuwN2,
+								#evbRyzWcuwN3_to,
+								#evbRyzWcuwN3_tr,
+								#evbRyzWcuwN4,
+								#evbRyzWcuwN4_to,
+								#evbRyzWcuwN5,
+								#evbRyzWcuwN5_to,
+								#evbRyzWcuwN6,
+								#evbRyzWcuwN6_to,
+								#evbRyzWcuwN7_to,
+								#evbRyzWcuwN11,
+								#evbRyzWcuwN12,
+								#evbRyzWcuwN12_to,
+								#evbRyzWcuwN13_ts,
+								#evbRyzWcuwN13,
+								#evbRyzWcuwN14_ts,
+								#evbRyzWcuwN14,
+								#evbRyzWcuwN21_tr,
+								#evbRyzWcuwN21,
+								#evbRyzWcuwN22_tr {
+									animation: none;
+								}
+
+								/* Animations only run when #submitted is targeted */
+								#submitted:target #evbRyzWcuwN2_to {
+									animation: evbRyzWcuwN2_to__to 4200ms linear 1 normal forwards;
+								}
+
+								@keyframes evbRyzWcuwN2_to__to {
+									0% {
+										transform: translate(121.201576px, 114.473001px)
+									}
+									10.238095% {
+										transform: translate(121.201576px, 114.473001px);
+										animation-timing-function: cubic-bezier(0.25,1,0.25,1)
+									}
+									40.47619% {
+										transform: translate(133.500002px, 79.543141px);
+										animation-timing-function: cubic-bezier(0,0,0.58,1)
+									}
+									50% {
+										transform: translate(129.436174px, 515.24383px)
+									}
+									100% {
+										transform: translate(129.436174px, 515.24383px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN2_tr {
+									animation: evbRyzWcuwN2_tr__tr 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN2_tr__tr {
+									0% {
+										transform: rotate(14.48733deg)
+									}
+									30.952381% {
+										transform: rotate(14.48733deg);
+										animation-timing-function: cubic-bezier(0.25,1,0.25,1)
+									}
+									40.47619% {
+										transform: rotate(-0.805117deg);
+										animation-timing-function: cubic-bezier(0.25,1,0.25,1)
+									}
+									45.238095% {
+										transform: rotate(12.245964deg)
+									}
+									100% {
+										transform: rotate(12.245964deg)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN2_ts {
+									animation: evbRyzWcuwN2_ts__ts 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN2_ts__ts {
+									0% {
+										transform: scale(1, 1)
+									}
+									33.333333% {
+										transform: scale(1, 1);
+										animation-timing-function: cubic-bezier(0.331079,0.7678,0.411614,0.954568)
+									}
+									41.190476% {
+										transform: scale(0.617748, 0.617748)
+									}
+									42.380952% {
+										transform: scale(0.42857, 0.42857)
+									}
+									43.809524% {
+										transform: scale(0.121199, 0.42857)
+									}
+									100% {
+										transform: scale(0.121199, 0.42857)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN2 {
+									animation: evbRyzWcuwN2_c_o 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN2_c_o {
+									0% {
+										opacity: 1
+									}
+									41.190476% {
+										opacity: 1
+									}
+									43.571429% {
+										opacity: 0
+									}
+									100% {
+										opacity: 0
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN3_to {
+									animation: evbRyzWcuwN3_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN3_to__to {
+									0% {
+										transform: translate(139.314003px, 113.977297px)
+									}
+									7.142857% {
+										transform: translate(139.314003px, 113.977297px)
+									}
+									40.47619% {
+										transform: translate(140.348506px, 69.36865px)
+									}
+									100% {
+										transform: translate(140.348506px, 69.36865px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN3_tr {
+									animation: evbRyzWcuwN3_tr__tr 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN3_tr__tr {
+									0% {
+										transform: rotate(0deg)
+									}
+									4.761905% {
+										transform: rotate(12deg)
+									}
+									100% {
+										transform: rotate(12deg)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN4 {
+									animation: evbRyzWcuwN4__m 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN4__m {
+									0% {
+										d: path('M135.999, 176.915L135.999, 252.915')
+									}
+									11.904762% {
+										d: path('M135.999, 176.915L135.999, 252.915');
+										animation-timing-function: cubic-bezier(0.42,0,1,1)
+									}
+									33.333333% {
+										d: path('M135.999, 176.915L125.486012, 251.305377');
+										animation-timing-function: cubic-bezier(0.42,0,0.58,1)
+									}
+									38.095238% {
+										d: path('M135.999, 176.915L136.476024, 250.602172')
+									}
+									100% {
+										d: path('M135.999, 176.915L136.476024, 250.602172')
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN4_to {
+									animation: evbRyzWcuwN4_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN4_to__to {
+									0% {
+										transform: translate(135.998993px, 214.914993px)
+									}
+									40.47619% {
+										transform: translate(137.033495px, 170.306346px)
+									}
+									100% {
+										transform: translate(137.033495px, 170.306346px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN5 {
+									animation: evbRyzWcuwN5__m 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN5__m {
+									0% {
+										d: path('M174, 177L187, 242')
+									}
+									9.52381% {
+										d: path('M174, 177L187, 242');
+										animation-timing-function: cubic-bezier(0.42,0,1,1)
+									}
+									35.714286% {
+										d: path('M174, 177L199.39146, 236.53555')
+									}
+									100% {
+										d: path('M174, 177L199.39146, 236.53555')
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN5_to {
+									animation: evbRyzWcuwN5_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN5_to__to {
+									0% {
+										transform: translate(180.5px, 209.5px)
+									}
+									40.47619% {
+										transform: translate(181.534502px, 164.891353px)
+									}
+									100% {
+										transform: translate(181.534502px, 164.891353px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN6 {
+									animation: evbRyzWcuwN6__m 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN6__m {
+									0% {
+										d: path('M10.5, 142C12.5, 143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 230.628, 76.4275, 230.628, 45.1315')
+									}
+									11.904762% {
+										d: path('M10.5, 142C12.5, 143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 230.628, 76.4275, 230.628, 45.1315')
+									}
+									17.619048% {
+										d: path('M10.5, 142C12.5, 143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+									19.285714% {
+										d: path('M29.635334, 83.870982C31.635334, 84.870982, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+									22.619048% {
+										d: path('M39.464193, 55.214045C41.464193, 56.214045, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+									32.857143% {
+										d: path('M4.77092, 88.092143C6.77092, 89.092143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 246.032059, 101.947387, 246.032059, 70.651387')
+									}
+									38.571429% {
+										d: path('M-14.592767, 106.442709C-12.592767, 107.442709, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+									49.52381% {
+										d: path('M10.5, 142C12.5, 143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+									100% {
+										d: path('M10.5, 142C12.5, 143, 11.0001, 107.5, 74.2779, 139.109M130.5, 145C200.365, 145, 254.430997, 113.363043, 254.430997, 82.067043')
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN6_to {
+									animation: evbRyzWcuwN6_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN6_to__to {
+									0% {
+										transform: translate(133.5px, 119px)
+									}
+									40.47619% {
+										transform: translate(134.534502px, 74.391353px)
+									}
+									100% {
+										transform: translate(134.534502px, 74.391353px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN7_to {
+									animation: evbRyzWcuwN7_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN7_to__to {
+									0% {
+										transform: translate(143.615992px, 50.775333px)
+									}
+									40.238095% {
+										transform: translate(146.923603px, 4.405054px)
+									}
+									100% {
+										transform: translate(146.923603px, 4.405054px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN11 {
+									animation: evbRyzWcuwN11__m 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN11__m {
+									0% {
+										d: path('M123.579, 135.127C126.493, 134.34, 127.898, 130.131, 126.714, 125.743C125.529, 121.356, 122.196, 118.426, 119.283, 119.212C116.37, 119.999, 114.964, 124.208, 116.148, 128.595C117.333, 132.983, 120.667, 135.913, 123.579, 135.127Z')
+									}
+									4.761905% {
+										d: path('M121.431065, 127.169487C124.345065, 126.382487, 127.898, 130.131, 126.714, 125.743C125.529, 121.356, 122.196, 118.426, 119.283, 119.212C116.37, 119.999, 114.964, 124.208, 116.148, 128.595C117.333, 132.983, 118.519065, 127.955487, 121.431065, 127.169487Z');
+										animation-timing-function: cubic-bezier(0.42,0,1,1)
+									}
+									21.428571% {
+										d: path('M124.121477, 135.680082C127.035477, 134.893082, 127.898, 130.131, 126.714, 125.743C125.529, 121.356, 122.196, 118.426, 119.283, 119.212C116.37, 119.999, 114.964, 124.208, 116.148, 128.595C117.333, 132.983, 121.209477, 136.466082, 124.121477, 135.680082Z')
+									}
+									100% {
+										d: path('M124.121477, 135.680082C127.035477, 134.893082, 127.898, 130.131, 126.714, 125.743C125.529, 121.356, 122.196, 118.426, 119.283, 119.212C116.37, 119.999, 114.964, 124.208, 116.148, 128.595C117.333, 132.983, 121.209477, 136.466082, 124.121477, 135.680082Z')
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN12 {
+									animation: evbRyzWcuwN12__m 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN12__m {
+									0% {
+										d: path('M190.495, 130.365C180.253, 139.145, 165.741, 146.374, 149.63, 150.724C133.523, 155.072, 117.343, 156.128, 104.074, 153.697C103.246, 153.545, 102.413, 153.936, 102.001, 154.666C101.586, 155.397, 101.682, 156.312, 102.239, 156.942C110.499, 166.315, 131.347, 168.788, 152.935, 162.96C174.531, 157.13, 191.302, 144.498, 193.718, 132.244')
+									}
+									16.666667% {
+										d: path('M190.495, 130.365C180.253, 139.145, 165.741, 146.374, 149.63, 150.724C133.523, 155.072, 117.343, 156.128, 104.074, 153.697C103.246, 153.545, 102.413, 153.936, 102.001, 154.666C101.586, 155.397, 101.682, 156.312, 102.239, 156.942C110.499, 166.315, 131.347, 168.788, 152.935, 162.96C174.531, 157.13, 191.302, 144.498, 193.718, 132.244');
+										animation-timing-function: cubic-bezier(0.25,1,0.25,1)
+									}
+									28.571429% {
+										d: path('M200.63054, 129.224587C200.63054, 129.224587, 161.872317, 149.162994, 149.63, 150.724C133.523, 155.072, 101.166963, 150.255579, 87.897963, 147.824579C87.069963, 147.672579, 85.890556, 147.388926, 85.478556, 148.118926C85.063556, 148.849926, 102.065681, 162.510756, 116.131301, 166.553885C130.196921, 170.597014, 154.702261, 168.521416, 162.165744, 165.941615C190.100884, 156.285654, 200.762359, 149.003198, 200.630541, 129.224587')
+									}
+									100% {
+										d: path('M200.63054, 129.224587C200.63054, 129.224587, 161.872317, 149.162994, 149.63, 150.724C133.523, 155.072, 101.166963, 150.255579, 87.897963, 147.824579C87.069963, 147.672579, 85.890556, 147.388926, 85.478556, 148.118926C85.063556, 148.849926, 102.065681, 162.510756, 116.131301, 166.553885C130.196921, 170.597014, 154.702261, 168.521416, 162.165744, 165.941615C190.100884, 156.285654, 200.762359, 149.003198, 200.630541, 129.224587')
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN12_to {
+									animation: evbRyzWcuwN12_to__to 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN12_to__to {
+									0% {
+										transform: translate(147.749889px, 147.991028px)
+									}
+									28.571429% {
+										transform: translate(148.624003px, 116.465396px)
+									}
+									40.47619% {
+										transform: translate(148.784391px, 103.382381px)
+									}
+									100% {
+										transform: translate(148.784391px, 103.382381px)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN13_ts {
+									animation: evbRyzWcuwN13_ts__ts 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN13_ts__ts {
+									0% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.213166, 1)
+									}
+									14.047619% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.213166, 1)
+									}
+									19.047619% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.558167, 1)
+									}
+									23.809524% {
+										transform: translate(137.033502px, 253.821091px) scale(-1.08964, 1)
+									}
+									45.238095% {
+										transform: translate(137.033502px, 253.821091px) scale(-1.08964, 1)
+									}
+									52.380952% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.298497, 0.757408)
+									}
+									54.761905% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.265395, 1)
+									}
+									100% {
+										transform: translate(137.033502px, 253.821091px) scale(-0.265395, 1)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN13 {
+									animation: evbRyzWcuwN13_c_o 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN13_c_o {
+									0% {
+										opacity: 0
+									}
+									10.714286% {
+										opacity: 0
+									}
+									15.238095% {
+										opacity: 1
+									}
+									40.47619% {
+										opacity: 1
+									}
+									52.380952% {
+										opacity: 0
+									}
+									100% {
+										opacity: 0
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN14_ts {
+									animation: evbRyzWcuwN14_ts__ts 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN14_ts__ts {
+									0% {
+										transform: translate(127.350789px, 115px) scale(0.187084, 0.187084)
+									}
+									59.52381% {
+										transform: translate(127.350789px, 115px) scale(0.187084, 0.187084);
+										animation-timing-function: cubic-bezier(0.42,0,0.58,1)
+									}
+									64.285714% {
+										transform: translate(127.350789px, 115px) scale(0.256411, 0.256411)
+									}
+									100% {
+										transform: translate(127.350789px, 115px) scale(0.256411, 0.256411)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN14 {
+									animation: evbRyzWcuwN14_c_o 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN14_c_o {
+									0% {
+										opacity: 0
+									}
+									57.142857% {
+										opacity: 0;
+										animation-timing-function: cubic-bezier(0.42,0,1,1)
+									}
+									64.285714% {
+										opacity: 1
+									}
+									100% {
+										opacity: 1
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN21_tr {
+									animation: evbRyzWcuwN21_tr__tr 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN21_tr__tr {
+									0% {
+										transform: translate(135.33781px, 207.03926px) rotate(720deg);
+										animation-timing-function: cubic-bezier(0.415,0.08,0.115,0.955)
+									}
+									100% {
+										transform: translate(135.33781px, 207.03926px) rotate(327.272727deg)
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN21 {
+									animation: evbRyzWcuwN21_f_p 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN21_f_p {
+									0% {
+										fill: #d2dbed
+									}
+									100% {
+										fill: #d2dbec
+									}
+								}
+
+								#submitted:target #evbRyzWcuwN22_tr {
+									animation: evbRyzWcuwN22_tr__tr 4200ms linear 1 normal forwards
+								}
+
+								@keyframes evbRyzWcuwN22_tr__tr {
+									0% {
+										transform: translate(11.12px, 29.9px) rotate(-720deg);
+										animation-timing-function: cubic-bezier(0.415,0.08,0.115,0.955)
+									}
+									100% {
+										transform: translate(11.12px, 29.9px) rotate(-327.272727deg)
+									}
+								}
+							</style>
+							<g id="evbRyzWcuwN2_to" transform="translate(121.201576,114.473001)">
+								<g id="evbRyzWcuwN2_tr" transform="rotate(14.48733)">
+									<g id="evbRyzWcuwN2_ts" transform="scale(1,1)">
+										<g id="evbRyzWcuwN2" transform="translate(-130.330889,-116.438981)">
+											<g id="evbRyzWcuwN3_to" transform="translate(139.314003,113.977297)">
+												<g id="evbRyzWcuwN3_tr" transform="rotate(0)">
+													<path d="M137.874,12.1486l11.955,44.9371l44.937-11.9542-56.892-32.9829Zm-7.478,1.9892L48,36.0571L95.817,215.806l134.811-35.863L196.755,52.6093L144.34,66.5528l-13.944-52.415Z" transform="translate(-139.314003,-113.977297)"/>
+												</g>
+											</g>
+											<g id="evbRyzWcuwN4_to" transform="translate(135.998993,214.914993)">
+												<path id="evbRyzWcuwN4" d="M135.999,176.915v76" transform="translate(-135.998993,-214.914993)" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+											</g>
+											<g id="evbRyzWcuwN5_to" transform="translate(180.5,209.5)">
+												<path id="evbRyzWcuwN5" d="M174,177l13,65" transform="translate(-180.5,-209.5)" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+											</g>
+											<g id="evbRyzWcuwN6_to" transform="translate(133.5,119)">
+												<path id="evbRyzWcuwN6" d="M10.5,142c2,1,.5001-34.5,63.7779-2.891M130.5,145c69.865,0,100.128-68.5725,100.128-99.8685" transform="translate(-133.5,-119)" fill="none" stroke="#000" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+											</g>
+											<g id="evbRyzWcuwN7_to" transform="translate(143.615992,50.775333)">
+												<g transform="translate(-144.862004,-96.004231)">
+													<path d="M123.265,141.638c5.166-1.394,7.658-8.859,5.558-16.639-2.1-7.779-8.011-12.975-13.176-11.58-5.166,1.394-7.659,8.859-5.559,16.638c2.1,7.78,8.012,12.975,13.177,11.581Z" transform="translate(-3.463203 33.25478)" fill="#fff"/>
+													<path d="M167.839,129.605c5.165-1.395,7.659-8.859,5.558-16.64-2.1-7.779-8.011-12.9742-13.177-11.58-5.164,1.395-7.657,8.859-5.557,16.638c2.101,7.78,8.012,12.976,13.176,11.582Z" transform="translate(-3.463203 33.855211)" fill="#fff"/>
+													<path d="M123.579,135.127c2.914-.787,4.319-4.996,3.135-9.384-1.185-4.387-4.518-7.317-7.431-6.531-2.913.787-4.319,4.996-3.135,9.383c1.185,4.388,4.519,7.318,7.431,6.532Z" transform="translate(-5.054347 33.25478)"/>
+													<path id="evbRyzWcuwN11" d="M123.579,135.127c2.914-.787,4.319-4.996,3.135-9.384-1.185-4.387-4.518-7.317-7.431-6.531-2.913.787-4.319,4.996-3.135,9.383c1.185,4.388,4.519,7.318,7.431,6.532Z" transform="translate(39.135922 22.180662)"/>
+												</g>
+											</g>
+											<g id="evbRyzWcuwN12_to" transform="translate(147.749889,147.991028)">
+												<path id="evbRyzWcuwN12" d="M190.495,130.365c-10.242,8.78-24.754,16.009-40.865,20.359-16.107,4.348-32.287,5.404-45.556,2.973-.828-.152-1.661.239-2.073.969-.415.731-.319,1.646.238,2.276c8.26,9.373,29.108,11.846,50.696,6.018c21.596-5.83,38.367-18.462,40.783-30.716" transform="scale(0.446949,0.668318) translate(-147.749889,-147.991028)" fill="#fff"/>
+											</g>
+										</g>
+									</g>
+								</g>
+							</g>
+							<g id="evbRyzWcuwN13_ts" transform="translate(137.033502,253.821091) scale(-0.213166,1)">
+								<ellipse id="evbRyzWcuwN13" rx="86.446309" ry="16.103724" transform="translate(0,0)" opacity="0" stroke-width="0"/>
+							</g>
+							<g id="evbRyzWcuwN14_ts" transform="translate(127.350789,115) scale(0.187084,0.187084)">
+								<path fill="#00bd53" id="evbRyzWcuwN14" d="M512,64c247.423568,0,448,200.576432,448,448s-200.576432,448-448,448-448-200.576432-448-448s200.576432-448,448-448ZM456.192,600.384L356.672,500.8c-15.004472-15.004472-39.331528-15.004472-54.336,0s-15.004472,39.331528,0,54.336l126.72,126.72c7.185804,7.24222,16.965768,11.315632,27.168,11.315632s19.982196-4.073412,27.168-11.315632l262.4-262.464c9.837942-9.668008,13.734819-23.869716,10.20879-37.204731s-13.933204-23.754462-27.264053-27.296204-27.537141.338394-37.216737,10.164935L456.192,600.384Z" transform="translate(-512,-512)" opacity="0"/>
+							</g>
+						</svg>
+
+					</div>
+				</div>
+			{% endif %}
 			<div class="overlay" id="cancel">
 				<a href="#" class="overlay-content" href="#"></a>
 				<div class="popup" style="max-height: 80vh; overflow-y: auto;">
 					<a href="#" class="close-btn">&times;</a>
 					<h1>Annuler la soumission</h1>
-					<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/cancel" method="POST">
+					<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/submissions/cancel" method="POST">
+						<input type="hidden" name="user_id" value="{{ session.user.id }}">
 						<div class="form-part">
 							<p>Êtes-vous certain de vouloir annuler la soumission de ce devoir ? Vous pourrez le soumettre à nouveau après l'annulation, tant que la date limite de soumission n'est pas dépassée.</p>
 
@@ -158,7 +737,7 @@
 							{% for file in assignment.instructionFiles %}
 								<li>
 									<p>{{ file.name }}</p>
-									<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/files/{{ file.id }}/download">
+									<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/files/{{ file.id }}/download?type=instruction">
 										<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 											<path d="M19.3517 7.61665L15.3929 4.05375C14.2651 3.03868 13.7012 2.53114 13.0092 2.26562L13 5.00011C13 7.35713 13 8.53564 13.7322 9.26787C14.4645 10.0001 15.643 10.0001 18 10.0001H21.5801C21.2175 9.29588 20.5684 8.71164 19.3517 7.61665Z" fill="currentColor"/>
 											<path fill-rule="evenodd" clip-rule="evenodd" d="M10 22H14C17.7712 22 19.6569 22 20.8284 20.8284C22 19.6569 22 17.7712 22 14V13.5629C22 12.6901 22 12.0344 21.9574 11.5001H18L17.9051 11.5001C16.808 11.5002 15.8385 11.5003 15.0569 11.3952C14.2098 11.2813 13.3628 11.0198 12.6716 10.3285C11.9803 9.63726 11.7188 8.79028 11.6049 7.94316C11.4998 7.16164 11.4999 6.19207 11.5 5.09497L11.5092 2.26057C11.5095 2.17813 11.5166 2.09659 11.53 2.01666C11.1214 2 10.6358 2 10.0298 2C6.23869 2 4.34315 2 3.17157 3.17157C2 4.34315 2 6.22876 2 10V14C2 17.7712 2 19.6569 3.17157 20.8284C4.34315 22 6.22876 22 10 22ZM7.98704 19.0472C8.27554 19.3176 8.72446 19.3176 9.01296 19.0472L11.013 17.1722C11.3151 16.8889 11.3305 16.4142 11.0472 16.112C10.7639 15.8099 10.2892 15.7945 9.98704 16.0778L9.25 16.7688L9.25 13.5C9.25 13.0858 8.91421 12.75 8.5 12.75C8.08579 12.75 7.75 13.0858 7.75 13.5V16.7688L7.01296 16.0778C6.71077 15.7945 6.23615 15.8099 5.95285 16.112C5.66955 16.4142 5.68486 16.8889 5.98704 17.1722L7.98704 19.0472Z" fill="currentColor"/>
@@ -178,7 +757,7 @@
 							{% for file in assignment.files %}
 								<li>
 									<p>{{ file.name }}</p>
-									<a href="/dashboard/files/{{ file.id }}/download">
+									<a href="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/files/{{ file.id }}/download">
 										<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 											<path d="M19.3517 7.61665L15.3929 4.05375C14.2651 3.03868 13.7012 2.53114 13.0092 2.26562L13 5.00011C13 7.35713 13 8.53564 13.7322 9.26787C14.4645 10.0001 15.643 10.0001 18 10.0001H21.5801C21.2175 9.29588 20.5684 8.71164 19.3517 7.61665Z" fill="currentColor"/>
 											<path fill-rule="evenodd" clip-rule="evenodd" d="M10 22H14C17.7712 22 19.6569 22 20.8284 20.8284C22 19.6569 22 17.7712 22 14V13.5629C22 12.6901 22 12.0344 21.9574 11.5001H18L17.9051 11.5001C16.808 11.5002 15.8385 11.5003 15.0569 11.3952C14.2098 11.2813 13.3628 11.0198 12.6716 10.3285C11.9803 9.63726 11.7188 8.79028 11.6049 7.94316C11.4998 7.16164 11.4999 6.19207 11.5 5.09497L11.5092 2.26057C11.5095 2.17813 11.5166 2.09659 11.53 2.01666C11.1214 2 10.6358 2 10.0298 2C6.23869 2 4.34315 2 3.17157 3.17157C2 4.34315 2 6.22876 2 10V14C2 17.7712 2 19.6569 3.17157 20.8284C4.34315 22 6.22876 22 10 22ZM7.98704 19.0472C8.27554 19.3176 8.72446 19.3176 9.01296 19.0472L11.013 17.1722C11.3151 16.8889 11.3305 16.4142 11.0472 16.112C10.7639 15.8099 10.2892 15.7945 9.98704 16.0778L9.25 16.7688L9.25 13.5C9.25 13.0858 8.91421 12.75 8.5 12.75C8.08579 12.75 7.75 13.0858 7.75 13.5V16.7688L7.01296 16.0778C6.71077 15.7945 6.23615 15.8099 5.95285 16.112C5.66955 16.4142 5.68486 16.8889 5.98704 17.1722L7.98704 19.0472Z" fill="currentColor"/>

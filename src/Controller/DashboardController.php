@@ -13,6 +13,8 @@ class DashboardController
     private $twig;
     private $userModel;
     private $schoolClassModel;
+    private $assignmentModel;
+    private $fileModel;
 
 
     public function __construct(Environment $twig, DependencyContainer $dependencyContainer)
@@ -20,6 +22,8 @@ class DashboardController
         $this->twig = $twig;
         $this->userModel = $dependencyContainer->get('UserModel');
         $this->schoolClassModel = $dependencyContainer->get('SchoolClassModel');
+        $this->assignmentModel = $dependencyContainer->get('AssignmentModel');
+        $this->fileModel = $dependencyContainer->get('FileModel');
     }
 
     public function dashboard()
@@ -30,9 +34,19 @@ class DashboardController
             exit;
         }
 
-        $classes = $this->schoolClassModel->getAllClasses($_SESSION['user']['id']);
+        $user = $this->userModel->getUserById($_SESSION['user']['id']);
+        if (!$user) {
+            unset($_SESSION['user']);
+            header('Location: /login');
+            exit;
+        }
 
-        echo $this->twig->render('dashboardController/dashboard.html.twig', ['classes' => $classes]);
+        $classes = $this->schoolClassModel->getAllClasses($user->getId());
+        $assignments = $this->assignmentModel->getAllAssignments($user);
+        $files = $this->fileModel->getAllFiles($user->getId());
+        $users = $this->userModel->getAllUsers();
+
+        echo $this->twig->render('dashboardController/dashboard.html.twig', ['classes' => $classes, 'assignments' => $assignments, 'files' => $files, 'users' => $users]);
     }
 
     //profile
