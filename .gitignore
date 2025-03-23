@@ -1,11 +1,10 @@
 # Ignore .env file
 .env
 
+/public/assets/upload
+
 # Ignore log files (Apache)
 logs/
-
-# Ignore node_modules directory (NPM dependencies)
-node_modules/
 
 # Ignore vendor directory (Composer dependencies)
 vendor/

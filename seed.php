@@ -1,4 +1,5 @@
 <?php
+// seed.php
 
 require 'vendor/autoload.php';
 

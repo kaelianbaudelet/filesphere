@@ -57,19 +57,22 @@
         {
             "name": "Kaelian Baudelet",
             "email": "contact@kaelian.dev",
-            "homepage": "https://github.com/afi-dev",
+            "homepage": "https://github.com/kaelianbaudelet",
             "role": "Lead Developer"
         },
         {
-            "name": "Noa Rodrigues",
+            "name": "Annalia PRIEU",
+            "email": "maxime.prieur@ecoles-epsi.net",
             "role": "Developer"
         },
         {
-            "name": "Arnaud",
+            "name": "Florian GUILBERT",
+            "email": "florian.guilbert@ecoles-epsi.net",
             "role": "Developer"
         },
         {
-            "name": "Vianney Hague",
+            "name": "Thibault ROYER",
+            "email": "thibault.royer1@ecoles-epsi.net",
             "role": "Developer"
         }
     ],
