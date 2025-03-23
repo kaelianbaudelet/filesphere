@@ -14,10 +14,24 @@ use App\Entity\Assignment;
 use PDO;
 use Exception;
 
+/**
+ * Modèle en charge de la gestion des classes
+ */
 class SchoolClassModel
 {
+    /**
+     * @var PDO Instance de la classe PDO
+     */
     private PDO $db;
+
+    /**
+     * @var UserModel|null Instance du modèle de gestion des utilisateurs
+     */
     private $userModel;
+
+    /**
+     * @var FileModel|null Instance du modèle de gestion des fichiers
+     */
     private $fileModel;
 
     public function __construct(PDO $db, $userModel = null, $fileModel = null)
@@ -27,33 +41,42 @@ class SchoolClassModel
         $this->fileModel = $fileModel;
     }
 
+    /**
+     * Définit le modèle de gestion des utilisateurs
+     *
+     * @param UserModel $userModel Le modèle de gestion des utilisateurs
+     */
     public function setUserModel($userModel): void
     {
         $this->userModel = $userModel;
     }
 
+    /**
+     * Définit le modèle de gestion des fichiers
+     *
+     * @param FileModel $fileModel Le modèle de gestion des fichiers
+     */
     public function setFileModel($fileModel): void
     {
         $this->fileModel = $fileModel;
     }
 
+    /**
+     * Crée une classe
+     *
+     * @param SchoolClass $class La classe à créer
+     */
     public function createClass(SchoolClass $class): ?SchoolClass
     {
         try {
-            // Démarrer la transaction
             $this->db->beginTransaction();
-
-            // Insérer la classe
             $sql = "INSERT INTO Class (teacher_id, file_id, color, name) VALUES (:teacher_id, :file_id, :color, :name)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':teacher_id', $class->getTeacher()->getId());
             $stmt->bindValue(':file_id', $class->getIcon() ? $class->getIcon()->getId() : null);
             $stmt->bindValue(':color', $class->getColor());
             $stmt->bindValue(':name', $class->getName());
-
             $stmt->execute();
-
-            // Récupérer l'UUID de la classe insérée
             $sql = "SELECT id FROM Class WHERE teacher_id = :teacher_id AND name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':teacher_id', $class->getTeacher()->getId());
@@ -66,7 +89,7 @@ class SchoolClassModel
             }
 
             $classId = $lastInsertedRow['id'];
-            // Insérer les étudiants
+
             $sql = "INSERT INTO ClassStudent (user_id, class_id) VALUES (:user_id, :class_id)";
             $stmt = $this->db->prepare($sql);
             foreach ($class->getStudents() as $student) {
@@ -75,50 +98,46 @@ class SchoolClassModel
                 $stmt->execute();
             }
 
-            // Valider la transaction
             $this->db->commit();
 
             return $this->getClassById($classId);
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de la création de la classe : " . $e->getMessage());
         }
     }
 
+    /**
+     * Télécharge les fichiers et les ajoute à un devoir
+     *
+     * @param array $files Les fichiers à télécharger
+     * @param Assignment $assignment Le devoir
+     * @param User $user L'utilisateur
+     */
     public function uploadFilesAndAddToAssignment(array $files, Assignment $assignment, User $user): bool
     {
         try {
             $this->db->beginTransaction();
             $fileIds = [];
 
-            // Vérifier la structure des fichiers
             $fileCount = is_array($files['name']) ? count($files['name']) : 0;
-
-            // Préparer les requêtes SQL
             $sqlFile = "INSERT INTO File (token, name, extension, size, user_id) VALUES (:token, :name, :extension, :size, :user_id)";
             $stmtFile = $this->db->prepare($sqlFile);
 
             $sqlGetFileId = "SELECT id FROM File WHERE token = :token ORDER BY created_at DESC LIMIT 1";
             $stmtGetFileId = $this->db->prepare($sqlGetFileId);
 
-            // Parcourir chaque fichier
             for ($i = 0; $i < $fileCount; $i++) {
 
                 $token = bin2hex(random_bytes(16));
                 $fileName = $files['name'][$i];
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-
-                // Insérer le fichier dans la base de données
                 $stmtFile->bindValue(':name', $fileName);
                 $stmtFile->bindValue(':token', $token);
                 $stmtFile->bindValue(':extension', $extension);
                 $stmtFile->bindValue(':size', $files['size'][$i]);
                 $stmtFile->bindValue(':user_id', $user->getId());
-
                 $stmtFile->execute();
-
-                // Récupérer l'UUID du fichier inséré
                 $stmtGetFileId->bindValue(':token', $token);
                 $stmtGetFileId->execute();
                 $lastInsertedRow = $stmtGetFileId->fetch(PDO::FETCH_ASSOC);
@@ -128,8 +147,6 @@ class SchoolClassModel
                 }
 
                 $fileIds[] = $lastInsertedRow['id'];
-
-                // Déplacer le fichier téléchargé
                 $uploadDir = __DIR__ . '/../../public/assets/upload/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
@@ -138,7 +155,6 @@ class SchoolClassModel
                 move_uploaded_file($files['tmp_name'][$i], $uploadDir . $token . '.' . $extension);
             }
 
-            // Ajouter les relations assignmentFile
             if (!empty($fileIds)) {
                 $sqlAssignmentFile = "INSERT INTO AssignmentFile (assignment_id, file_id) VALUES (:assignment_id, :file_id)";
                 $stmtAssignmentFile = $this->db->prepare($sqlAssignmentFile);
@@ -149,24 +165,24 @@ class SchoolClassModel
                     $stmtAssignmentFile->execute();
                 }
             }
-
-            // Valider la transaction
             $this->db->commit();
             return true;
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de l'envoi des fichiers : " . $e->getMessage());
         }
     }
 
-    //deleteAssignmentFilesByUserId (en gros on delete un ou plusieurs ficheir qui sotn dans AssignmentFiles qui sont lié a un user)
+    /**
+     * Supprime les fichiers d'un devoir pour un utilisateur
+     *
+     * @param Assignment $assignment Le devoir
+     * @param User $user L'utilisateur
+     */
     public function deleteAssignmentFilesByUserId($assignment, $user): bool
     {
         try {
             $this->db->beginTransaction();
-
-            // Get the files to delete (including token and extension for file deletion)
             $sqlGetFiles = "SELECT f.id, f.token, f.extension FROM File f
                             JOIN AssignmentFile af ON f.id = af.file_id
                             WHERE f.user_id = :user_id AND af.assignment_id = :assignment_id";
@@ -175,11 +191,7 @@ class SchoolClassModel
             $stmtGetFiles->bindValue(':assignment_id', $assignment->getId());
             $stmtGetFiles->execute();
             $files = $stmtGetFiles->fetchAll(PDO::FETCH_ASSOC);
-
-            // Extract just the IDs for the database operations
             $fileIds = array_column($files, 'id');
-
-            // Delete physical files from the filesystem
             $uploadDir = __DIR__ . '/../../public/assets/upload/';
             foreach ($files as $file) {
                 $filePath = $uploadDir . $file['token'] . '.' . $file['extension'];
@@ -188,7 +200,6 @@ class SchoolClassModel
                 }
             }
 
-            // Delete the AssignmentFile relations
             $sqlDeleteAssignmentFile = "DELETE FROM AssignmentFile
                                        WHERE assignment_id = :assignment_id
                                        AND file_id IN (SELECT id FROM File WHERE user_id = :user_id)";
@@ -197,7 +208,6 @@ class SchoolClassModel
             $stmtDeleteAssignmentFile->bindValue(':assignment_id', $assignment->getId());
             $stmtDeleteAssignmentFile->execute();
 
-            // Delete the File records
             if (!empty($fileIds)) {
                 $placeholders = implode(',', array_fill(0, count($fileIds), '?'));
                 $sqlDeleteFile = "DELETE FROM File WHERE id IN ($placeholders)";
@@ -216,6 +226,11 @@ class SchoolClassModel
         }
     }
 
+    /**
+     * Récupère un fichier par son identifiant
+     *
+     * @param string $id L'identifiant du fichier
+     */
     public function getFileById(string $id): ?File
     {
         $sql = "SELECT * FROM File WHERE id = :id";
@@ -240,7 +255,11 @@ class SchoolClassModel
         );
     }
 
-
+    /**
+     * Récupère une classe par son identifiant
+     *
+     * @param string $id L'identifiant de la classe
+     */
     public function getClassById(string $id): ?SchoolClass
     {
         $sql = "SELECT * FROM Class WHERE id = :id";
@@ -263,13 +282,11 @@ class SchoolClassModel
             new \DateTime($row['updated_at'])
         );
 
-        // Récupérer les étudiants de cette classe
         $students = $this->getStudentsByClassId($row['id']);
         foreach ($students as $student) {
             $class->addStudent($student);
         }
 
-        //sections
         $sections = $this->getSectionsByClassId($row['id']);
         foreach ($sections as $section) {
             $class->addSection($section);
@@ -277,6 +294,12 @@ class SchoolClassModel
 
         return $class;
     }
+
+    /**
+     * Met à jour une classe
+     *
+     * @param SchoolClass $class La classe à mettre à jour
+     */
     public function updateClass(SchoolClass $class): bool
     {
         try {
@@ -291,6 +314,11 @@ class SchoolClassModel
         }
     }
 
+    /**
+     * Met à jour un devoir
+     *
+     * @param Assignment $assignment Le devoir à mettre à jour
+     */
     public function updateAssignment(assignment $assignment): bool
     {
         try {
@@ -308,6 +336,12 @@ class SchoolClassModel
             throw new Exception("Erreur lors de la mise à jour du devoir : " . $e->getMessage());
         }
     }
+
+    /**
+     * Récupère toutes les classes
+     *
+     * @param string $userId L'identifiant de l'utilisateur
+     */
     public function getAllClasses(string $userId): array
     {
         $user = $this->getUserById($userId);
@@ -341,13 +375,11 @@ class SchoolClassModel
                 new \DateTime($row['updated_at'])
             );
 
-            // Récupérer les étudiants pour cette classe
             $students = $this->getStudentsByClassId($row['id']);
             foreach ($students as $student) {
                 $class->addStudent($student);
             }
 
-            // Récupérer les sections pour cette classe
             $sections = $this->getSectionsByClassId($row['id']);
             foreach ($sections as $section) {
                 $class->addSection($section);
@@ -359,18 +391,21 @@ class SchoolClassModel
         return $classes;
     }
 
+    /**
+     * Supprime une classe
+     *
+     * @param string $id L'identifiant de la classe
+     */
     public function deleteClass(string $id): bool
     {
         try {
             $this->db->beginTransaction();
 
-            // Supprimer d'abord les relations étudiant-classe
             $sql = "DELETE FROM ClassStudent WHERE class_id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id);
             $stmt->execute();
 
-            // Supprimer ensuite la classe
             $sql = "DELETE FROM Class WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id);
@@ -384,18 +419,21 @@ class SchoolClassModel
         }
     }
 
+    /**
+     * Supprime un devoir
+     *
+     * @param string $assignmentId L'identifiant du devoir
+     */
     public function deleteAssignment(string $assignmentId): bool
     {
         try {
             $this->db->beginTransaction();
 
-            // Supprimer d'abord les relations section-devoir
             $sql = "DELETE FROM SectionAssignment WHERE assignment_id = :assignment_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':assignment_id', $assignmentId);
             $stmt->execute();
 
-            // Supprimer ensuite le devoir
             $sql = "DELETE FROM Assignment WHERE id = :assignment_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':assignment_id', $assignmentId);
@@ -409,6 +447,11 @@ class SchoolClassModel
         }
     }
 
+    /**
+     * Récupère les élèves d'une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     */
     public function getStudentsByClassId(string $classId): array
     {
         $sql = "SELECT u.* FROM User u
@@ -437,6 +480,11 @@ class SchoolClassModel
         return $students;
     }
 
+    /**
+     * Récupère les sections d'une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     */
     public function getSectionsByClassId(string $classId): array
     {
         $sql = "SELECT s.* FROM Section s
@@ -466,7 +514,12 @@ class SchoolClassModel
 
         return $sections;
     }
-    // getassignmentsBySectionId (Sectionassignment join)
+
+    /**
+     * Récupère les devoirs d'une section
+     *
+     * @param string $sectionId L'identifiant de la section
+     */
     public function getAssignmentsBySectionId(string $sectionId): array
     {
         $sql = "SELECT h.* FROM Assignment h
@@ -502,7 +555,12 @@ class SchoolClassModel
         return $assignments;
     }
 
-
+    /**
+     * Récupère les fichiers d'un devoir
+     *
+     * @param string $assignmentId L'identifiant du devoir
+     * @param User $user L'utilisateur
+     */
     public function getFilesByAssignmentId(string $assignmentId, User $user): array
     {
         $user = $this->getUserById($user->getId());
@@ -544,7 +602,11 @@ class SchoolClassModel
         return $files;
     }
 
-
+    /**
+     * Récupère les fichiers d'instructions d'un devoir
+     *
+     * @param string $assignmentId L'identifiant du devoir
+     */
     public function getInstructionsFilesByAssignmentId(string $assignmentId): array
     {
         $sql = "SELECT f.* FROM File f
@@ -572,14 +634,19 @@ class SchoolClassModel
         return $files;
     }
 
+    /**
+     * Récupère un utilisateur par son identifiant
+     *
+     * @param string $id L'identifiant de l'utilisateur
+     */
     public function getUserById(string $id): ?User
     {
-        // Si un UserModel a été injecté, l'utiliser
+
         if ($this->userModel) {
             return $this->userModel->getUserById($id);
         }
 
-        // Sinon, faire la requête directement
+
         $sql = "SELECT * FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id);
@@ -604,19 +671,22 @@ class SchoolClassModel
         );
     }
 
+    /**
+     * Crée une section et l'ajoute à une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     * @param Section $section La section à créer
+     */
     public function createSectionAndAddToClass(string $classId, Section $section): bool
     {
         try {
-            // Démarrer la transaction
             $this->db->beginTransaction();
 
-            // Insérer la section
             $sql = "INSERT INTO Section (name) VALUES (:name)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':name', $section->getName());
             $stmt->execute();
 
-            // Récupérer l'UUID de la section insérée
             $sql = "SELECT id FROM Section WHERE name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':name', $section->getName());
@@ -629,32 +699,34 @@ class SchoolClassModel
 
             $sectionId = $lastInsertedRow['id'];
 
-            // Ajouter la relation ClassSection
             $sql = "INSERT INTO ClassSection (section_id, class_id) VALUES (:section_id, :class_id)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':section_id', $sectionId);
             $stmt->bindValue(':class_id', $classId);
             $stmt->execute();
 
-            // Valider la transaction
             $this->db->commit();
 
             return true;
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de l'ajout de la section à la classe : " . $e->getMessage());
         }
     }
 
-    //createassignmentAndAddToSection
+    /**
+     * Crée un devoir et l'ajoute à une section
+     *
+     * @param string $sectionId L'identifiant de la section
+     * @param Assignment $assignment Le devoir à créer
+     * @param array|null $instructionsFiles Les fichiers d'instructions
+     * @param string|null $userId L'identifiant de l'utilisateur
+     */
     public function createAssignmentAndAddToSection(string $sectionId, assignment $assignment, ?array $instructionsFiles = null, ?string $userId = null): bool
     {
         try {
-            // Démarrer la transaction
             $this->db->beginTransaction();
 
-            // Insérer le devoir
             $sql = "INSERT INTO Assignment (name, description, start_period, end_period, allow_late_submission, max_files) VALUES
 (:name, :description, :start_period, :end_period, :allow_late_submission, :max_files)";
 
@@ -667,7 +739,6 @@ class SchoolClassModel
             $stmt->bindValue(':max_files', $assignment->getMaxFiles());
             $stmt->execute();
 
-            // Récupérer l'UUID du devoir inséré
             $sql = "SELECT id FROM Assignment WHERE name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':name', $assignment->getName());
@@ -680,56 +751,55 @@ class SchoolClassModel
 
             $assignmentId = $lastInsertedRow['id'];
 
-            // Ajouter la relation Sectionassignment
             $sql = "INSERT INTO SectionAssignment (section_id, assignment_id) VALUES (:section_id, :assignment_id)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':section_id', $sectionId);
             $stmt->bindValue(':assignment_id', $assignmentId);
             $stmt->execute();
 
-            // Valider la transaction
             $this->db->commit();
 
-            // si des fichiers d'instructions sont fournis, les télécharger et les ajouter au devoir
             if ($instructionsFiles) {
                 $this->uploadInstructionFilesAndAddToAssignment($instructionsFiles, $assignmentId, $userId);
             }
 
             return true;
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de l'ajout du devoir à la section : " . $e->getMessage());
         }
     }
 
+    /**
+     * Télécharger les fichiers d'instructions et les ajouter à un devoir
+     *
+     * @param array $files Les fichiers à télécharger
+     * @param string $assignmentId L'identifiant du devoir
+     * @param string $userId L'identifiant de l'utilisateur
+     */
     public function uploadInstructionFilesAndAddToAssignment(array $files, string $assignmentId, string $userId): bool
     {
         try {
             $this->db->beginTransaction();
             $fileIds = [];
 
-            // Vérifier la structure des fichiers
             $fileCount = is_array($files['name']) ? count($files['name']) : 0;
 
-            // Préparer les requêtes SQL
             $sqlFile = "INSERT INTO File (token, name, extension, size, user_id) VALUES (:token, :name, :extension, :size, :user_id)";
             $stmtFile = $this->db->prepare($sqlFile);
 
             $sqlGetFileId = "SELECT id FROM File WHERE token = :token ORDER BY created_at DESC LIMIT 1";
             $stmtGetFileId = $this->db->prepare($sqlGetFileId);
 
-            // Parcourir chaque fichier
             for ($i = 0; $i < $fileCount; $i++) {
                 if ($files['error'][$i] !== UPLOAD_ERR_OK) {
-                    continue; // Ignorer les fichiers avec erreur
+                    continue;
                 }
 
                 $token = bin2hex(random_bytes(16));
                 $fileName = $files['name'][$i];
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                // Insérer le fichier dans la base de données
                 $stmtFile->bindValue(':name', $fileName);
                 $stmtFile->bindValue(':token', $token);
                 $stmtFile->bindValue(':extension', $extension);
@@ -738,7 +808,6 @@ class SchoolClassModel
 
                 $stmtFile->execute();
 
-                // Récupérer l'UUID du fichier inséré
                 $stmtGetFileId->bindValue(':token', $token);
                 $stmtGetFileId->execute();
                 $lastInsertedRow = $stmtGetFileId->fetch(PDO::FETCH_ASSOC);
@@ -749,7 +818,6 @@ class SchoolClassModel
 
                 $fileIds[] = $lastInsertedRow['id'];
 
-                // Déplacer le fichier téléchargé
                 $uploadDir = __DIR__ . '/../../public/assets/upload/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
@@ -758,7 +826,6 @@ class SchoolClassModel
                 move_uploaded_file($files['tmp_name'][$i], $uploadDir . $token . '.' . $extension);
             }
 
-            // Ajouter les relations assignmentFile
             if (!empty($fileIds)) {
                 $sqlAssignmentFile = "INSERT INTO AssignmentInstructionFile (assignment_id, file_id) VALUES (:assignment_id, :file_id)";
                 $stmtAssignmentFile = $this->db->prepare($sqlAssignmentFile);
@@ -770,16 +837,19 @@ class SchoolClassModel
                 }
             }
 
-            // Valider la transaction
             $this->db->commit();
             return true;
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollBack();
             throw new Exception("Erreur lors de l'envoi des fichiers d'instructions : " . $e->getMessage());
         }
     }
 
+    /**
+     * Met à jour une section
+     *
+     * @param Section $section La section à mettre à jour
+     */
     public function updateSection(Section $section): bool
     {
         try {
@@ -793,7 +863,11 @@ class SchoolClassModel
         }
     }
 
-    //getSectionById
+    /**
+     * Récupère une section par son identifiant
+     *
+     * @param string $id L'identifiant de la section
+     */
     public function getSectionById(string $id): ?Section
     {
         $sql = "SELECT * FROM Section WHERE id = :id";
@@ -813,7 +887,6 @@ class SchoolClassModel
             new \DateTime($row['updated_at'])
         );
 
-        // Récupérer les devoirs de cette section
         $assignments = $this->getAssignmentsBySectionId($row['id']);
         foreach ($assignments as $assignment) {
             $section->addAssignment($assignment);
@@ -822,7 +895,13 @@ class SchoolClassModel
         return $section;
     }
 
-    //getassignmentById
+    /**
+     * Récupère un devoir par son identifiant
+     *
+     * @param string $id L'identifiant du devoir
+     * @param User $user L'utilisateur
+     */
+
     public function getAssignmentById(string $id, User $user): ?assignment
     {
         $sql = "SELECT * FROM Assignment WHERE id = :id";
@@ -860,6 +939,12 @@ class SchoolClassModel
         return $assignment;
     }
 
+    /**
+     * Supprime une section d'une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     * @param string $sectionId L'identifiant de la section
+     */
     public function deleteSectionAndDeleteFromClass(string $classId, string $sectionId): bool
     {
         try {
@@ -884,21 +969,62 @@ class SchoolClassModel
         }
     }
 
-    //deleteassignmentAndDeleteFromSection
+    /**
+     * Supprime un fichier
+     *
+     * @param string $fileId L'identifiant du fichier
+     */
+    public function deleteFile(string $fileId): bool
+    {
+        try {
+            $this->db->beginTransaction();
 
+            $sql = "SELECT * FROM File WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $fileId);
+            $stmt->execute();
+            $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$file) {
+                throw new Exception("Fichier introuvable.");
+            }
+
+            $sql = "DELETE FROM File WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $fileId);
+            $stmt->execute();
+
+            $uploadDir = __DIR__ . '/../../public/assets/upload/';
+            $filePath = $uploadDir . $file['token'] . '.' . $file['extension'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw new Exception("Erreur lors de la suppression du fichier : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Supprime un devoir et le retire d'une section
+     *
+     * @param string $sectionId L'identifiant de la section
+     * @param string $assignmentId L'identifiant du devoir
+     */
     public function deleteAssignmentAndDeleteFromSection(string $sectionId, string $assignmentId): bool
     {
         try {
             $this->db->beginTransaction();
 
-            // Supprimer la relation Sectionassignment
             $sql = "DELETE FROM SectionAssignment WHERE section_id = :section_id AND assignment_id = :assignment_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':section_id', $sectionId);
             $stmt->bindValue(':assignment_id', $assignmentId);
             $stmt->execute();
 
-            // Supprimer le devoir
             $sql = "DELETE FROM Assignment WHERE id = :assignment_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':assignment_id', $assignmentId);
@@ -912,11 +1038,15 @@ class SchoolClassModel
         }
     }
 
-
+    /**
+     * Ajoute un étudiant à une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     * @param string $studentId L'identifiant de l'étudiant
+     */
     public function addStudentToClass(string $classId, string $studentId): bool
     {
         try {
-            // Vérifier si la relation n'existe pas déjà
             $sql = "SELECT COUNT(*) as count FROM ClassStudent WHERE class_id = :class_id AND user_id = :user_id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':class_id', $classId);
@@ -925,10 +1055,9 @@ class SchoolClassModel
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($result['count'] > 0) {
-                return true; // La relation existe déjà
+                return true;
             }
 
-            // Ajouter la relation
             $sql = "INSERT INTO ClassStudent (user_id, class_id) VALUES (:user_id, :class_id)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':user_id', $studentId);
@@ -939,6 +1068,12 @@ class SchoolClassModel
         }
     }
 
+    /**
+     * Retire un étudiant d'une classe
+     *
+     * @param string $classId L'identifiant de la classe
+     * @param string $studentId L'identifiant de l'étudiant
+     */
     public function removeStudentFromClass(string $classId, string $studentId): bool
     {
         try {

@@ -8,30 +8,45 @@
 	{% do clear_session_alert() %}
 	<div class="app-body-main-content">
 		<section class="page-section">
-			<div class="page-breacrumb">
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb">
-						<li class="breadcrumb-item">
-							<a href="/dashboard/users">
-								Utilisateurs
-							</a>
-							<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</li>
-						<li class="breadcrumb-item active" aria-current="page">
-							Modifier l'utilisateur
-							{{ user.name }}
-						</li>
-					</ol>
-				</nav>
+
+
+			<div class="page-header-container">
+				<button id="toggle-navigation" class="toggle-navigation">
+					<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 6C4 5.44772 4.44772 5 5 5H19C19.5523 5 20 5.44772 20 6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6Z" fill="#000000"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z" fill="#000000"></path>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M5 17C4.44772 17 4 17.4477 4 18C4 18.5523 4.44772 19 5 19H19C19.5523 19 20 18.5523 20 18C20 17.4477 19.5523 17 19 17H5Z" fill="#000000"></path>
+					</svg>
+				</button>
+				<div class="page-breacrumb">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<a href="/dashboard/users">
+									Utilisateurs
+								</a>
+								<svg width="10" height="10" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</li>
+							<li class="breadcrumb-item active" aria-current="page">
+								Modifier l'utilisateur
+								{{ user.name }}
+							</li>
+						</ol>
+					</nav>
+				</div>
 			</div>
+
+
 			<div class="page-header">
 				<h2>
 					Modifier l'utilisateur
 					{{ user.name }}
 				</h2>
 			</div>
+
+
 			<div class="update-user">
 				<form action="/dashboard/users/{{ user.id }}/edit" method="POST" class="form">
 					<h1>Information du compte</h1>

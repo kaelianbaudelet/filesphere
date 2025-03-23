@@ -1073,7 +1073,7 @@ input[type="file"] {
 
 .classes {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: 1rem;
     row-gap: 1rem;
     margin-top: 1.25rem;
@@ -1104,6 +1104,7 @@ input[type="file"] {
 .class .class-header-content {
     border-left: 0px solid transparent;
     transition: border-left 0.25s ease;
+    width: 100%;
 }
 
 .class:hover .class-header-content {
@@ -1126,6 +1127,12 @@ input[type="file"] {
 
 .class-header a {
     width: 100%;
+}
+
+.class-header details {
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
 .class-header button {
@@ -1157,21 +1164,32 @@ input[type="file"] {
 .class-header .class-details {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.3rem;
     margin: auto 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .class-header h3 {
     font-size: 1.1rem;
     font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .class-header p {
     font-size: 0.875rem;
     color: #666;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .class-header .class-icon {
+    flex-shrink: 0;
     width: 70px;
     height: 70px;
     border-radius: 12px;
@@ -1201,6 +1219,14 @@ input[type="file"] {
     text-indent: 0 !important; /* Supprime l'espace réservé */
     display: block; /* Évite les comportements imprévisibles */
     background: none !important; /* Supprime tout arrière-plan ajouté */
+}
+
+.class-header .class-icon span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: white;
+    mix-blend-mode: hard-light;
 }
 
 .assignments {
@@ -1919,7 +1945,7 @@ input[type="file"] {
 .profile-info h1 {
     font-size: 18px;
     font-weight: 500;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 .profile-info-item {
     display: flex;

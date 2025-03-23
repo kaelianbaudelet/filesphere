@@ -1,41 +1,74 @@
 <?php
+// src/Controller/AuthController.php
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Entity\User;
+
 use App\Service\DependencyContainer;
-use Twig\Environment;
 use App\Service\Mailer;
+
+use Twig\Environment;
+
+use App\Model\UserModel;
 
 class AuthController
 {
-    private $twig;
-    private $userModel;
-    private $mailer;
+    /**
+     * @var Twig Instance de la classe Twig
+     */
+    private \Twig\Environment $twig;
 
-    public function __construct(Environment $twig, DependencyContainer $dependencyContainer)
-    {
+    /**
+     * @var UserModel Instance de la classe UserModel
+     */
+    private UserModel $userModel;
+
+    /**
+     * @var Mailer Instance de la classe Mailer
+     */
+    private Mailer $mailer;
+
+    public function __construct(
+        Environment $twig,
+        DependencyContainer $dependencyContainer
+    ) {
         $this->twig = $twig;
         $this->userModel = $dependencyContainer->get('UserModel');
         $this->mailer = new Mailer($twig);
     }
 
+    /**
+     * Affiche la page d'inscription temporaire.
+     *
+     * @return void
+     */
+
     public function tempregister()
     {
 
+        // Vérifie si la création de compte temporaire n'est pas activée
+        if ($_ENV['TEMP_REGISTER'] != "true") {
+            // Affiche une page d'erreur 404
+            echo $this->twig->render('defaultController/404.html.twig', []);
+        }
+
+        // Vérifie si l'utilisateur est connecté
         if (isset($_SESSION['user'])) {
             header('Location: /dashboard');
             exit;
         }
 
+        // Vérifie si la méthode HTTP est POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'];
             $role = $_POST['role'];
             $name = $_POST['name'];
 
+            // Vérifie si les champs obligatoires sont remplis
             if (!$email || !$password || !$role || !$name) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
@@ -45,6 +78,7 @@ class AuthController
                 exit;
             }
 
+            // Vérifie si le rôle est correct
             if (!in_array($role, ['student', 'teacher', 'admin'])) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
@@ -54,8 +88,8 @@ class AuthController
                 exit;
             }
 
+            // Vérifie si l'email est déjà utilisé
             $user = $this->userModel->getUserByEmail($email);
-
             if ($user) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
@@ -65,29 +99,31 @@ class AuthController
                 exit;
             }
 
-            // model
-
+            // Crée un nouvel objet utilisateur
             $user = new User(
-                null, // id null par défaut (mariaDB)
+                null,
                 $role,
                 $name,
                 $email,
                 password_hash($password, PASSWORD_DEFAULT),
-                true, // is_active true par défaut (mariaDB)
-                null, // reset_token null par défaut (mariaDB)
-                null, // reset_token_expires_at null par défaut (mariaDB)
+                true,
+                null,
+                null,
                 null,
                 null,
             );
-            $this->userModel->createUser($user);
 
+            // Crée l'utilisateur
+            $this->userModel->createUser($user);
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Compte créé avec succès.',
             ];
 
+            // Récupère l'utilisateur créé précédemment
             $user = $this->userModel->getUserByEmail($email);
 
+            // Créer une session utilisateur
             $_SESSION['user'] = [
                 'id' => $user->getId(),
                 'role' => $user->getRole(),
@@ -96,23 +132,37 @@ class AuthController
                 'is_active' => $user->getIsActive(),
             ];
 
+            // Redirige vers le tableau de bord
             header('Location: /dashboard');
             exit;
         }
+        // Affiche le formulaire d'inscription
         echo $this->twig->render('authController/register.html.twig', []);
     }
 
+
+    /**
+     * Affiche la page de connexion.
+     *
+     * @return void
+     */
+
     public function login()
     {
+
+        // Vérifie si l'utilisateur est connecté
         if (isset($_SESSION['user'])) {
+            // Redirige vers le tableau de bord
             header('Location: /dashboard');
             exit;
         }
 
+        // Vérifie si la méthode HTTP est POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'];
 
+            // Vérifie si les champs obligatoires sont remplis
             if (!$email || !$password) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
@@ -122,8 +172,10 @@ class AuthController
                 exit;
             }
 
+            // Récupère l'utilisateur par email
             $user = $this->userModel->getUserByEmail($email);
 
+            // Vérifie si l'utilisateur existe et si le mot de passe est correct
             if ($user && password_verify($password, $user->getPassword())) {
 
                 $_SESSION['user'] = [
@@ -134,13 +186,16 @@ class AuthController
                     'is_active' => $user->getIsActive(),
                 ];
 
+                // Redirige vers le tableau de bord
                 header('Location: /dashboard');
                 exit;
             } else {
+                // Affiche un message d'erreur si l'email ou le mot de passe est incorrect
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Email ou mot de passe incorrect.',
                 ];
+                // Redirige vers la page de connexion
                 header('Location: /login');
                 exit;
             }
@@ -172,10 +227,16 @@ class AuthController
                 $user->setResetTokenExpiresAt(new \DateTime('+1 hour'));
                 $this->userModel->updateUser($user);
 
-                //->sendAccountResetPasswordEmail($user->getId(), $user->getName(), $user->getEmail(), $token);
+                try {
+                    $this->mailer->sendAccountResetPasswordEmail($user->getId(), $user->getName(), $user->getEmail(), $token);
+                } catch (\Exception $e) {
+                    $_SESSION['alert'] = ['status' => 'error', 'message' => "Une erreur est survenue lors de l'envoi de l'email."];
+                    header('Location: /resetpassword');
+                    exit;
+                }
             }
 
-            $_SESSION['alert'] = ['status' => 'success', 'message' => "Si cet email est enregistré, un lien de réinitialisation a été envoyé."];
+            $_SESSION['alert'] = ['status' => 'success', 'message' => "Si cet email est enregistré, un lien de réinitialisation a été envoyé.", 'context' => 'global'];
             header('Location: /resetpassword');
             exit;
         }

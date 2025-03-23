@@ -1,4 +1,5 @@
 <?php
+// src/Model/SectionModel.php
 
 declare(strict_types=1);
 
@@ -7,8 +8,14 @@ namespace App\Model;
 use App\Entity\Section;
 use PDO;
 
+/**
+ * Modèle en charge de la gestion des sections
+ */
 class SectionModel
 {
+    /**
+     * @var PDO Instance de la classe PDO
+     */
     private PDO $db;
 
     public function __construct(PDO $db)
@@ -16,6 +23,11 @@ class SectionModel
         $this->db = $db;
     }
 
+    /**
+     * Crée une section
+     *
+     * @param Section $section La section
+     */
     public function createSection(Section $section): bool
     {
         $sql = "INSERT INTO Section (name, created_at, updated_at) VALUES
@@ -28,6 +40,11 @@ class SectionModel
         return $stmt->execute();
     }
 
+    /**
+     * Récupère une section par son identifiant
+     *
+     * @param string $id L'identifiant de la section
+     */
     public function getSectionById(string $id): ?Section
     {
         $sql = "SELECT * FROM Section WHERE id = :id";
@@ -46,6 +63,11 @@ class SectionModel
         );
     }
 
+    /**
+     * Met à jour une section
+     *
+     * @param Section $section La section
+     */
     public function updateSection(Section $section): bool
     {
         $sql = "UPDATE Section SET name = :name, updated_at = :updated_at WHERE id = :id";
@@ -56,6 +78,11 @@ class SectionModel
         return $stmt->execute();
     }
 
+    /**
+     * Récupère toutes les sections
+     *
+     * @return Section[] Les sections
+     */
     public function getAllSections(): array
     {
         $sql = "SELECT * FROM Section";
@@ -72,6 +99,11 @@ class SectionModel
         return $sections;
     }
 
+    /**
+     * Supprime une section
+     *
+     * @param string $id L'identifiant de la section
+     */
     public function deleteSection(string $id): bool
     {
         $sql = "DELETE FROM Section WHERE id = :id";

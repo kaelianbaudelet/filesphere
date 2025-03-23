@@ -7,14 +7,28 @@
 {% block content %}
 	<div class="app-body-main-content">
 		<section>
-
-
-			<div class="page-header">
-				<h2>
-					Fichiers
-				</h2>
-				<a href="#upload" class="button">Uploader en fichier</a>
+			<div class="page-header-container">
+				<button id="toggle-navigation" class="toggle-navigation">
+					<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 6C4 5.44772 4.44772 5 5 5H19C19.5523 5 20 5.44772 20 6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6Z" fill="#000000"/>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z" fill="#000000"/>
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M5 17C4.44772 17 4 17.4477 4 18C4 18.5523 4.44772 19 5 19H19C19.5523 19 20 18.5523 20 18C20 17.4477 19.5523 17 19 17H5Z" fill="#000000"/>
+					</svg>
+				</button>
+				<div class="page-header">
+					<h2>
+						Fichiers
+					</h2>
+					{% if session.user.role == "admin" %}
+						<a href="#upload" class="button">Téléverser un fichier</a>
+					{% endif %}
+				</div>
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			<div class="overlay" id="upload">
 				<a href="#" class="overlay-content" href="#"></a>
 				<div class="popup" style="max-height: 80vh; overflow-y: auto;">

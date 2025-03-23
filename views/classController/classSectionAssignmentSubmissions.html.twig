@@ -70,14 +70,17 @@
 					</nav>
 				</div>
 			</div>
-
-
 			<div class="page-header">
 				<h2>
 					Soumissions du devoir
 					{{ assignment.name }}
 				</h2>
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			<table class="content-table">
 				<thead>
 					<tr>
@@ -101,7 +104,7 @@
 								<div class="form-part">
 									<p>Êtes-vous sûr de vouloir supprimer ce fichier.</p>
 								</div>
-								<form action="/dashboard/files/{{ file.id }}/delete" method="post">
+								<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/assignments/{{ assignment.id }}/files/{{ file.id }}/delete" method="post">
 									<button type="submit" class="danger">Supprimer</button>
 								</form>
 							</div>

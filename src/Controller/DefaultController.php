@@ -1,17 +1,20 @@
 <?php
+// src/Controller/DefaultController.php
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
-
 use App\Service\DependencyContainer;
+
 use Twig\Environment;
 
 class DefaultController
 {
-    private $twig;
-
+    /**
+     * @var Twig Instance de la classe Twig
+     */
+    private \Twig\Environment $twig;
 
     public function __construct(Environment $twig, DependencyContainer $dependencyContainer)
     {

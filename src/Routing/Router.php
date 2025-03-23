@@ -1,4 +1,5 @@
 <?php
+// src/Routing/Router.php
 
 declare(strict_types=1);
 
@@ -83,6 +84,7 @@ class Router
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions/cancel' => [SchoolClassController::class, 'cancelSubmission'],
 
             'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/download' => [SchoolClassController::class, 'downloadFile'],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/delete' => [SchoolClassController::class, 'deleteFile'],
         ];
 
         $this->defaultPage = '';

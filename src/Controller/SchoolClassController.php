@@ -5,18 +5,22 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DependencyContainer;
-use Twig\Environment;
-
 use App\Entity\SchoolClass;
 use App\Entity\Section;
 use App\Entity\Assignment;
 use App\Entity\File;
 
+use App\Service\DependencyContainer;
+
+use Twig\Environment;
 
 class SchoolClassController
 {
-    private $twig;
+    /**
+     * @var Twig Instance de la classe Twig
+     */
+    private \Twig\Environment $twig;
+
     private $schoolClassModel;
     private $userModel;
     private $fileModel;
@@ -88,7 +92,6 @@ class SchoolClassController
         ]);
     }
 
-    // sections
     public function sections(string $class_id)
     {
 
@@ -186,8 +189,6 @@ class SchoolClassController
         ]);
     }
 
-
-    // assignments
     public function assignments(string $class_id, string $section_id)
     {
 
@@ -411,7 +412,6 @@ class SchoolClassController
             exit;
         }
 
-        // on verif que les param (slug) sont bien là
         $class = $this->schoolClassModel->getClassById($class_id);
         if (!$class) {
             $_SESSION['alert'] = [
@@ -549,6 +549,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Classe non trouvée.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -559,6 +560,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Section non trouvée.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -572,6 +574,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe ou de section manquant.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -632,11 +635,13 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Devoir ajouté à la section avec succès.',
+                'context' => 'global',
             ];
         } catch (\Exception $e) {
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Erreur lors de l\'ajout du devoir: ' . $e->getMessage(),
+                'context' => 'global',
             ];
         }
 
@@ -663,6 +668,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe requis.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -672,8 +678,9 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Nom de section requis.',
+                'context' => 'modal',
             ];
-            header("Location: /dashboard/classes/{$class_id}/sections");
+            header("Location: /dashboard/classes/{$class_id}/sections#creation");
             exit;
         }
 
@@ -682,6 +689,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Classe non trouvée.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -694,11 +702,13 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Section ajoutée à la classe avec succès.',
+                'context' => 'global',
             ];
         } catch (\Exception $e) {
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Erreur lors de l\'ajout de la section: ' . $e->getMessage(),
+                'context' => 'global',
             ];
         }
 
@@ -706,7 +716,6 @@ class SchoolClassController
         exit;
     }
 
-    //updateSection() method
     public function updateSection(string $class_id, string $section_id)
     {
 
@@ -724,6 +733,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe requis.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -733,18 +743,19 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de section requis.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections");
             exit;
         }
 
-        // Affichage du formulaire pour l'édition
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $section = $this->schoolClassModel->getSectionById($section_id);
             if (!$section) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Section non trouvée.',
+                    'context' => 'global',
                 ];
                 header("Location: /dashboard/classes/{$class_id}/sections");
                 exit;
@@ -755,6 +766,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Classe non trouvée.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -773,6 +785,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Nom de section requis.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/edit");
             exit;
@@ -785,6 +798,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Section mise à jour avec succès.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections");
             exit;
@@ -792,6 +806,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Erreur lors de la mise à jour de la section: ' . $e->getMessage(),
+                'context' => 'global',
             ];
         }
 
@@ -816,12 +831,12 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe, de section ou de devoir requis.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
         }
 
-        // Affichage du formulaire pour l'édition
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
             $user = $this->userModel->getUserById($_SESSION['user']['id']);
@@ -829,6 +844,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Utilisateur non trouvé.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -839,6 +855,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Devoir non trouvé.',
+                    'context' => 'global',
                 ];
                 header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments");
                 exit;
@@ -849,6 +866,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Classe non trouvée.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -859,6 +877,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Section non trouvée.',
+                    'context' => 'global',
                 ];
                 header("Location: /dashboard/classes/{$class_id}/sections");
                 exit;
@@ -883,6 +902,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Les champs nom, description, période de début, période de fin et nombre de fichiers sont requis.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/edit");
             exit;
@@ -892,6 +912,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'La période de début doit être inférieure à la période de fin.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/edit");
             exit;
@@ -928,7 +949,6 @@ class SchoolClassController
         exit;
     }
 
-    // addStudent() method
     public function addStudent(string $class_id)
     {
 
@@ -1037,7 +1057,6 @@ class SchoolClassController
         exit;
     }
 
-    // deleteassignment() method
     public function deleteAssignment(string $class_id, string $section_id, string $assignment_id)
     {
 
@@ -1101,7 +1120,70 @@ class SchoolClassController
         exit;
     }
 
-    // deleteSection() method
+    public function deleteFile(string $class_id, string $section_id, string $assignment_id, string $file_id)
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'teacher') {
+            echo $this->twig->render('defaultController/403.html.twig');
+            exit;
+        }
+
+        if (!$class_id || !$section_id || !$assignment_id || !$file_id) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'ID de classe, de section, de devoir ou de fichier manquant.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        $file = $this->schoolClassModel->getFileById($file_id);
+        if (!$file) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Fichier non trouvé.',
+            ];
+            header('Location: /dashboard/classes/' . $class_id . '/sections/' . $section_id . '/assignments/' . $assignment_id . '/details');
+            exit;
+        }
+
+        $uploadDir = __DIR__ . '/../../public/assets/upload/';
+        $filePath = $uploadDir . $file->getToken() . '.' . $file->getExtension();
+
+        if (!file_exists($filePath)) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Fichier non trouvé.',
+            ];
+            header('Location: /dashboard/classes');
+            exit;
+        }
+
+        unlink($filePath);
+
+        try {
+            $this->schoolClassModel->deleteFile($file_id);
+            $_SESSION['alert'] = [
+                'status' => 'success',
+                'message' => 'Fichier supprimé avec succès.',
+                'context' => 'global',
+            ];
+        } catch (\Exception $e) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Erreur lors de la suppression du fichier: ' . $e->getMessage(),
+                'context' => 'global',
+            ];
+        }
+
+        header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/submissions");
+        exit;
+    }
+
     public function deleteSection(string $class_id, string $section_id)
     {
 
@@ -1174,24 +1256,13 @@ class SchoolClassController
             $color = $_POST['color'] ?? null;
             $icon = $_FILES['icon'] ?? [];
 
-            // Validation des données
-            $errors = [];
-            if (!$teacherId) {
-                $errors[] = 'Le professeur est requis.';
-            }
-            if (!$name) {
-                $errors[] = 'Le nom de la classe est requis.';
-            }
-            if (!$color) {
-                $errors[] = 'La couleur est requise.';
-            }
-
-            if (!empty($errors)) {
+            if (!$teacherId || !$name || !$students || !$color) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
-                    'message' => implode(' ', $errors),
+                    'message' => 'Les champs professeur, nom, étudiants et couleur sont requis.',
+                    'context' => 'modal',
                 ];
-                header('Location: /dashboard/classes');
+                header('Location: /dashboard/classes#creation');
                 exit;
             }
 
@@ -1200,6 +1271,7 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Professeur non trouvé.',
+                    'context' => 'modal',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -1225,6 +1297,7 @@ class SchoolClassController
                     $_SESSION['alert'] = [
                         'status' => 'error',
                         'message' => 'Erreur lors du téléchargement de l\'icône.',
+                        'context' => 'global',
                     ];
                     header('Location: /dashboard/classes');
                     exit;
@@ -1239,6 +1312,7 @@ class SchoolClassController
                     $_SESSION['alert'] = [
                         'status' => 'error',
                         'message' => 'Erreur lors du déplacement de l\'icône.',
+                        'context' => 'global',
                     ];
                     header('Location: /dashboard/classes');
                     exit;
@@ -1252,7 +1326,6 @@ class SchoolClassController
                 $file = $this->fileModel->getFileByToken($token);
             }
 
-            // Créer la classe
             $class = new SchoolClass(
                 null,
                 $teacher,
@@ -1263,7 +1336,6 @@ class SchoolClassController
                 new \DateTime()
             );
 
-            // Ajouter les étudiants
             foreach ($students as $studentId) {
                 $student = $this->userModel->getUserById($studentId);
                 if ($student) {
@@ -1276,11 +1348,13 @@ class SchoolClassController
                 $_SESSION['alert'] = [
                     'status' => 'success',
                     'message' => 'Classe créée avec succès.',
+                    'context' => 'global',
                 ];
             } catch (\Exception $e) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Erreur lors de la création de la classe: ' . $e->getMessage(),
+                    'context' => 'global',
                 ];
             }
 
@@ -1308,18 +1382,19 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe manquant.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
         }
 
-        // Affichage du formulaire pour l'édition
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $class = $this->schoolClassModel->getClassById($class_id);
             if (!$class) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Classe non trouvée.',
+                    'context' => 'global',
                 ];
                 header('Location: /dashboard/classes');
                 exit;
@@ -1329,7 +1404,6 @@ class SchoolClassController
             $students = $this->userModel->getAllStudents();
             $classStudents = $this->schoolClassModel->getStudentsByClassId($class_id);
 
-            // Préparation des IDs d'étudiants pour la sélection multiple dans le formulaire
             $selectedStudentIds = array_map(function ($student) {
                 return $student->getId();
             }, $classStudents);
@@ -1349,7 +1423,8 @@ class SchoolClassController
         if (!$name) {
             $_SESSION['alert'] = [
                 'status' => 'error',
-                'message' => 'Nom classe requis.',
+                'message' => 'Nom de classe requis.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/edit");
             exit;
@@ -1359,6 +1434,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Professeur requis.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/edit");
             exit;
@@ -1369,6 +1445,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Professeur non trouvé.',
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/edit");
             exit;
@@ -1379,6 +1456,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Classe non trouvée.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -1392,12 +1470,14 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Classe mise à jour avec succès.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
         } catch (\Exception $e) {
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Erreur lors de la mise à jour de la classe: ' . $e->getMessage(),
+                'context' => 'global',
             ];
             header("Location: /dashboard/classes/{$class_id}/edit");
         }
@@ -1421,6 +1501,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'ID de classe manquant.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/classes');
             exit;
@@ -1431,6 +1512,7 @@ class SchoolClassController
             $_SESSION['alert'] = [
                 'status' => 'success',
                 'message' => 'Classe supprimée avec succès.',
+                'context' => 'global',
             ];
         } catch (\Exception $e) {
             $_SESSION['alert'] = [
@@ -1489,8 +1571,6 @@ class SchoolClassController
         header('Location: /dashboard/classes');
         exit;
     }
-
-
 
     public function removeStudentFromClass()
     {

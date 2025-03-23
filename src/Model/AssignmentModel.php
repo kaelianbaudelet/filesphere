@@ -1,4 +1,5 @@
 <?php
+// src/Model/AssignmentModel.php
 
 declare(strict_types=1);
 
@@ -8,14 +9,26 @@ use PDO;
 use App\Entity\Assignment;
 use App\Entity\User;
 
+/**
+ * Modèle en charge de la gestion des devoirs
+ */
 class AssignmentModel
 {
+    /**
+     * @var PDO Instance de la classe PDO
+     */
     private PDO $db;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
     }
+
+    /**
+     * Récupère tous les devoirs d'un élève
+     *
+     * @param User $student L'élève
+     */
     public function getAllAssignments(User $student): array
     {
         $stmt = $this->db->prepare('

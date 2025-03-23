@@ -1,16 +1,23 @@
 <?php
+// src/Controller/FileController.php
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DependencyContainer;
-use Twig\Environment;
 use App\Entity\File;
+
+use App\Service\DependencyContainer;
+
+use Twig\Environment;
 
 class FileController
 {
-    private $twig;
+    /**
+     * @var Twig Instance de la classe Twig
+     */
+    private \Twig\Environment $twig;
+
     private $fileModel;
     private $userModel;
     private $uploadDir;
@@ -63,7 +70,7 @@ class FileController
                 $fileError = $files['error'][$key];
 
                 if (empty($fileTmpName) || $fileError !== UPLOAD_ERR_OK) {
-                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'File upload failed.'];
+                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'Fichier(s) non téléchargé(s). Une erreur est survenue.', 'context' => 'global'];
                     header('Location: /dashboard/files');
                     exit;
                 }
@@ -72,7 +79,7 @@ class FileController
                 $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
                 if (!in_array($fileType, $allowedTypes) || !in_array($fileExtension, $allowedExtensions)) {
-                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'Invalid file type or extension.'];
+                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'Fichier(s) non autorisé(s).', 'context' => 'global'];
                     header('Location: /dashboard/files');
                     exit;
                 }
@@ -83,7 +90,7 @@ class FileController
                 $uploadFile = $this->uploadDir . $newFileName;
 
                 if (!move_uploaded_file($fileTmpName, $uploadFile)) {
-                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'File move failed.'];
+                    $_SESSION['alert'] = ['status' => 'error', 'message' => 'Fichier(s) non téléchargé(s). Une erreur est survenue.', 'context' => 'global'];
                     header('Location: /dashboard/files');
                     exit;
                 }
@@ -94,7 +101,7 @@ class FileController
                 $this->fileModel->createFile($file);
             }
 
-            $_SESSION['alert'] = ['status' => 'success', 'message' => 'Files uploaded successfully.'];
+            $_SESSION['alert'] = ['status' => 'success', 'message' => 'Fichier(s) téléchargé(s) avec succès.', 'context' => 'global'];
             header('Location: /dashboard/files');
             exit;
         }
@@ -119,7 +126,7 @@ class FileController
         $file = $this->fileModel->getFileById($fileId);
 
         if (!$file) {
-            $_SESSION['alert'] = ['status' => 'error', 'message' => 'File not found.'];
+            $_SESSION['alert'] = ['status' => 'error', 'message' => 'Fichier introuvable.', 'context' => 'global'];
             header('Location: /dashboard/files');
             exit;
         }

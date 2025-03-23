@@ -41,8 +41,6 @@
 					</nav>
 				</div>
 			</div>
-
-
 			<div class="page-header">
 				<h2>
 					Sections de
@@ -52,6 +50,11 @@
 					<a href="#creation" class="button">Créer une section</a>
 				{% endif %}
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-top: 16px; margin-bottom: 26px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			{% if session.user.role == "admin" %}
 				<div class="overlay" id="creation">
 					<a href="#" class="overlay-content" href="#"></a>
@@ -73,11 +76,6 @@
 						</form>
 					</div>
 				</div>
-			{% endif %}
-			{% if session.alert and session.alert.context == 'global' %}
-				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
-					{{ session.alert.message }}
-				</p>
 			{% endif %}
 			<div class="sections">
 				{% for section in class.sections %}
@@ -110,7 +108,6 @@
 									</div>
 								</div>
 							</a>
-
 							{% if session.user.role in ["teacher", "admin"] %}
 								<details class="dropdown" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0">
 									<summary role="button">

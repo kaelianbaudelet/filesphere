@@ -10,7 +10,6 @@
 {% block content %}
 	<div class="app-body-main-content">
 		<section>
-
 			<div class="page-header-container">
 				<button id="toggle-navigation" class="toggle-navigation">
 					<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -59,8 +58,6 @@
 					</nav>
 				</div>
 			</div>
-
-
 			<div class="page-header">
 				<h2>
 					Devoir de la section
@@ -73,7 +70,7 @@
 				{% endif %}
 			</div>
 			{% if session.alert and session.alert.context == 'global' %}
-				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-top: 16px; margin-bottom: 26px;">
 					{{ session.alert.message }}
 				</p>
 			{% endif %}

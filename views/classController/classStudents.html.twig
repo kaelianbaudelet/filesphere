@@ -49,6 +49,11 @@
 				</h2>
 				<a href="#upload" class="button">Ajouter un étudiant</a>
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-top: 16px; margin-bottom: 26px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			<div class="overlay" id="upload">
 				<a href="#" class="overlay-content" href="#"></a>
 				<div class="popup" style="max-height: 80vh; overflow-y: auto;">

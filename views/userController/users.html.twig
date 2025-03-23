@@ -22,11 +22,21 @@
 					{% endif %}
 				</div>
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			<div class="overlay" id="creation">
 				<a href="#" class="overlay-content" href="#"></a>
 				<div class="popup" style="max-height: 80vh; overflow-y: auto;">
 					<a href="#" class="close-btn">&times;</a>
 					<h1>Créer un utilisateur</h1>
+					{% if session.alert and session.alert.context == 'modal' %}
+						<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-bottom: 20px;">
+							{{ session.alert.message }}
+						</p>
+					{% endif %}
 					<form action="/dashboard/users/create" method="POST" enctype="multipart/form-data">
 						<div class="form-part">
 							<label for="name">Nom</label>
@@ -49,8 +59,6 @@
 					</form>
 				</div>
 			</div>
-
-
 			<table class="content-table">
 				<thead>
 					<tr>

@@ -38,7 +38,6 @@
 					</nav>
 				</div>
 			</div>
-
 			<div class="page-header">
 				<h2>
 					Modifier la section
@@ -47,6 +46,11 @@
 					{{ class.name }}
 				</h2>
 			</div>
+			{% if session.alert and session.alert.context == 'global' %}
+				<p class="{{ session.alert.status == 'error' ? 'error-message' : 'success-message' }}" style="margin-top: 16px; margin-bottom: 26px;">
+					{{ session.alert.message }}
+				</p>
+			{% endif %}
 			<div class="update-user">
 				<form action="/dashboard/classes/{{ class.id }}/sections/{{ section.id }}/edit" method="POST" class="form">
 					<h1>Information de la section</h1>

@@ -1,17 +1,24 @@
 <?php
+// src/Controller/UserController.php
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DependencyContainer;
-use Twig\Environment;
 use App\Entity\User;
+
+use App\Service\DependencyContainer;
 use App\Service\Mailer;
+
+use Twig\Environment;
 
 class UserController
 {
-    private $twig;
+    /**
+     * @var Twig Instance de la classe Twig
+     */
+    private \Twig\Environment $twig;
+
     private $userModel;
     private $mailer;
 
@@ -61,10 +68,10 @@ class UserController
             if (!$email || !$type || !$name) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
-                    'message' => 'Email, type et nom sont obligatoires.',
-                    'context' => 'popup',
+                    'message' => 'Nom d\'utilisateur, email et role sont obligatoires.',
+                    'context' => 'modal',
                 ];
-                header('Location: /dashboard/users#create');
+                header('Location: /dashboard/users#creation');
                 exit;
             }
 
@@ -72,9 +79,9 @@ class UserController
                 $_SESSION['alert'] = [
                     'status' => 'error',
                     'message' => 'Type incorrect.',
-                    'context' => 'popup',
+                    'context' => 'modal',
                 ];
-                header('Location: /dashboard/users#create');
+                header('Location: /dashboard/users#creation');
                 exit;
             }
 
@@ -83,10 +90,10 @@ class UserController
             if ($user) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
-                    'message' => 'Email déjà utilisé.',
-                    'context' => 'popup',
+                    'message' => 'L\'adresse email est déjà utilisée.',
+                    'context' => 'modal',
                 ];
-                header('Location: /dashboard/users#create');
+                header('Location: /dashboard/users#creation');
                 exit;
             }
 
@@ -106,11 +113,21 @@ class UserController
 
             $this->userModel->createUser($user);
 
-            //$this->mailer->sendAccountCreationEmail($name, $email, $password);
+            try {
+                $this->mailer->sendAccountCreationEmail($name, $email, $password);
+            } catch (\Exception $e) {
+                $_SESSION['alert'] = [
+                    'status' => 'error',
+                    'message' => 'Erreur lors de l\'envoi du mail.',
+                    'context' => 'global',
+                ];
+                header('Location: /dashboard/users');
+                exit;
+            }
 
             $_SESSION['alert'] = [
                 'status' => 'success',
-                'message' => 'Compte créé avec succès.',
+                'message' => 'Compte créé avec succès. Un mot de passe a été envoyé à ' . $email,
                 'context' => 'global',
             ];
             header('Location: /dashboard/users');
@@ -167,7 +184,6 @@ class UserController
                 exit;
             }
 
-            // Récupération de l'utilisateur par slug (UUID)
             $user = $this->userModel->getUserById($user_id);
             if (!$user) {
                 $_SESSION['alert'] = [
@@ -179,7 +195,6 @@ class UserController
                 exit;
             }
 
-            // Vérifie si l'utilisateur modifie son propre compte
             if ($user->getId() == $_SESSION['user']['id']) {
                 $_SESSION['alert'] = [
                     'status' => 'error',
@@ -190,7 +205,6 @@ class UserController
                 exit;
             }
 
-            // Mise à jour des informations utilisateur
             $user->setEmail($email);
             $user->setRole($type);
             $user->setName($name);
@@ -206,7 +220,6 @@ class UserController
             exit;
         }
 
-        // Récupération de l'utilisateur avant l'affichage du formulaire
         $user = $this->userModel->getUserById($user_id);
         if (!$user) {
             $_SESSION['alert'] = [
@@ -223,19 +236,16 @@ class UserController
 
     public function deleteUser(string $user_id)
     {
-        // Vérification si l'utilisateur est connecté
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
             exit;
         }
 
-        // Vérification si l'utilisateur a les droits d'admin
         if (!is_array($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
             echo $this->twig->render('defaultController/403.html.twig');
             exit;
         }
 
-        // Vérification que la méthode HTTP est POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['alert'] = [
                 'status' => 'error',
@@ -246,7 +256,6 @@ class UserController
             exit;
         }
 
-        // Récupérer l'utilisateur en utilisant son slug (UUID)
         $user = $this->userModel->getUserById($user_id);
         if (!$user) {
             $_SESSION['alert'] = [
@@ -258,13 +267,10 @@ class UserController
             exit;
         }
 
-        // Vérification que l'admin ne tente pas de supprimer son propre compte
         if ($user->getId() == $_SESSION['user']['id']) {
-            // Suppression de la session si l'admin supprime son propre compte
             session_destroy();
         }
 
-        // Suppression de l'utilisateur
         $this->userModel->deleteUser($user);
 
         $_SESSION['alert'] = [
@@ -273,9 +279,18 @@ class UserController
             'context' => 'global',
         ];
 
-        //$this->mailer->sendAccountDeletionEmail($user->getName(), $user->getEmail());
+        try {
+            $this->mailer->sendAccountDeletionEmail($user->getName(), $user->getEmail());
+        } catch (\Exception $e) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Erreur lors de l\'envoi du mail.',
+                'context' => 'global',
+            ];
+            header('Location: /dashboard/users');
+            exit;
+        }
 
-        // Redirection vers la liste des utilisateurs
         header('Location: /dashboard/users');
         exit;
     }
@@ -297,6 +312,7 @@ class UserController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Méthode non autorisée.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/users');
             exit;
@@ -318,6 +334,7 @@ class UserController
             $_SESSION['alert'] = [
                 'status' => 'error',
                 'message' => 'Utilisateur non trouvé.',
+                'context' => 'global',
             ];
             header('Location: /dashboard/users');
             exit;
@@ -326,11 +343,22 @@ class UserController
         $this->userModel->resetPassword($user, password_hash($password, PASSWORD_DEFAULT));
         $user = $this->userModel->getUserById($user_id);
 
+        try {
+            $this->mailer->sendAccountResetPasswordByAdminEmail($user->getName(), $user->getEmail(), $password);
+        } catch (\Exception $e) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Erreur lors de l\'envoi du mail.',
+                'context' => 'global',
+            ];
+            header('Location: /dashboard/users');
+            exit;
+        }
 
-        //$this->mailer->sendAccountResetPasswordByAdminEmail($user->getName(), $user->getEmail(), $password);
         $_SESSION['alert'] = [
             'status' => 'success',
             'message' => 'Un nouveau mot de passe a été envoyé à ' . $user->getEmail(),
+            'context' => 'global',
         ];
 
         header('Location: /dashboard/users');

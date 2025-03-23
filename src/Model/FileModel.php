@@ -1,4 +1,5 @@
 <?php
+// src/Model/FileModel.php
 
 declare(strict_types=1);
 
@@ -8,8 +9,14 @@ use App\Entity\File;
 use App\Entity\User;
 use PDO;
 
+/**
+ * Modèle en charge de la gestion des fichiers
+ */
 class FileModel
 {
+    /**
+     * @var PDO Instance de la classe PDO
+     */
     private PDO $db;
 
     public function __construct(PDO $db)
@@ -17,6 +24,11 @@ class FileModel
         $this->db = $db;
     }
 
+    /**
+     * Crée un fichier
+     *
+     * @param File $file Le fichier à créer
+     */
     public function createFile(File $file): bool
     {
         $sql = "INSERT INTO File (token, name, extension, size, user_id, created_at, updated_at) VALUES
@@ -33,6 +45,11 @@ class FileModel
         return $stmt->execute();
     }
 
+    /**
+     * Récupère un fichier par son identifiant
+     *
+     * @param string $id L'identifiant du fichier
+     */
     public function getFileById(string $id): ?File
     {
         $sql = "SELECT * FROM File WHERE id = :id";
@@ -54,6 +71,12 @@ class FileModel
             new \DateTime($row['updated_at'])
         );
     }
+
+    /**
+     * Met à jour un fichier
+     *
+     * @param File $file Le fichier à mettre à jour
+     */
     public function updateFile(File $file): bool
     {
         $sql = "UPDATE File SET name = :name, extension = :extension, updated_at = :updated_at WHERE id = :id";
@@ -65,6 +88,11 @@ class FileModel
         return $stmt->execute();
     }
 
+    /**
+     * Récupère tous les fichiers
+     *
+     * @return File[] La liste des fichiers
+     */
     public function getAllFiles(): array
     {
         $sql = "SELECT * FROM File";
@@ -85,6 +113,11 @@ class FileModel
         return $files;
     }
 
+    /**
+     * Récupère un fichier par son token
+     *
+     * @param string $token Le token du fichier
+     */
     public function getFileByToken(string $token): ?File
     {
         $sql = "SELECT * FROM File WHERE token = :token";
@@ -107,6 +140,11 @@ class FileModel
         );
     }
 
+    /**
+     * Supprime un fichier
+     *
+     * @param string $id L'identifiant du fichier
+     */
     public function deleteFile(string $id): bool
     {
         $sql = "DELETE FROM File WHERE id = :id";
@@ -115,7 +153,11 @@ class FileModel
         return $stmt->execute();
     }
 
-
+    /**
+     * Récupère un utilisateur par son identifiant
+     *
+     * @param string $id L'identifiant de l'utilisateur
+     */
     public function getUserById(string $id): ?User
     {
         $sql = "SELECT * FROM User WHERE id = :id";

@@ -1,5 +1,6 @@
 <?php
-// Path: src/Service/EmailService.php
+// src/Service/Mailer.php
+
 namespace App\Service;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -17,8 +18,6 @@ class Mailer
     {
 
         $this->mail = new PHPMailer(false);
-
-        //Configuring SMTP
         $this->mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $this->mail->isSMTP();
         $this->mail->Host       = $_ENV['SMTP_HOST'];
@@ -30,7 +29,7 @@ class Mailer
         $this->mail->Port       = $_ENV['SMTP_PORT'];
         $this->mail->CharSet = 'UTF-8';
         $this->twig = $twig;
-        $this->mail->setFrom('noreply@kaelian.dev', 'Hotel Neptune');
+        $this->mail->setFrom($_ENV['SMTP_SEND_EMAIL'], $_ENV['SMTP_SEND_NAME']);
     }
 
 
@@ -111,8 +110,6 @@ class Mailer
         }
     }
 
-    // sendAccountResetPasswordEmail
-
     public function sendAccountResetPasswordEmail(string $user_id, string $name, string $email, string $resetToken)
     {
         try {
@@ -151,6 +148,27 @@ class Mailer
             ]);
 
             $altBody = 'Vous avez été ajouté à la classe ' . $className;
+
+            $this->send($to, $toName, $subject, $body, $altBody);
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+        }
+    }
+
+    public function sendAccountResetPasswordSuccessNotification(string $name, string $email)
+    {
+        try {
+            $to = $email;
+            $toName = $name;
+
+            $subject = 'Votre mot de passe a été modifié';
+
+            $body = $this->twig->render('email/accountResetPasswordSuccessNotification.html.twig', [
+                'name' => $name,
+                'email' => $email,
+            ]);
+
+            $altBody = 'Votre mot de passe a été modifié avec succès';
 
             $this->send($to, $toName, $subject, $body, $altBody);
         } catch (Exception $e) {
