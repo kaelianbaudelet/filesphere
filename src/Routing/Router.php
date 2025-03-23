@@ -57,13 +57,13 @@ class Router
             'dashboard/users/{user}/resetpassword' => [UserController::class, 'resetPassword', ['admin']],
 
             // Fichiers
-            'dashboard/files' => [FileController::class, 'files', ['admin', 'teacher', 'student']],
-            'dashboard/files/upload' => [FileController::class, 'uploadFile', ['admin', 'teacher', 'student']],
-            'dashboard/files/{file}/download' => [FileController::class, 'downloadFile', ['admin', 'teacher', 'student']],
-            'dashboard/files/{file}/delete' => [FileController::class, 'deleteFile', ['admin', 'teacher', 'student']],
+            'dashboard/files' => [FileController::class, 'files', ['admin']],
+            'dashboard/files/upload' => [FileController::class, 'uploadFile', ['admin']],
+            'dashboard/files/{file}/download' => [FileController::class, 'downloadFile', ['admin']],
+            'dashboard/files/{file}/delete' => [FileController::class, 'deleteFile', ['admin']],
 
             // Devoirs de l'etudiant
-            'dashboard/assignments' => [AssignmentController::class, 'assignments', ['admin', 'teacher', 'student']],
+            'dashboard/assignments' => [AssignmentController::class, 'assignments', ['student']],
 
             // Classes
             'dashboard/classes' => [SchoolClassController::class, 'classes', ['admin', 'teacher', 'student']],
@@ -72,9 +72,9 @@ class Router
             'dashboard/classes/{class}/delete' => [SchoolClassController::class, 'deleteClass', ['admin']],
 
             // Etudiants
-            'dashboard/classes/{class}/students' => [SchoolClassController::class, 'students', ['admin', 'teacher']],
-            'dashboard/classes/{class}/students/add' => [SchoolClassController::class, 'addStudent', ['admin', 'teacher']],
-            'dashboard/classes/{class}/students/{student}/delete' => [SchoolClassController::class, 'deleteStudent', ['admin', 'teacher']],
+            'dashboard/classes/{class}/students' => [SchoolClassController::class, 'students', ['admin']],
+            'dashboard/classes/{class}/students/add' => [SchoolClassController::class, 'addStudent', ['admin']],
+            'dashboard/classes/{class}/students/{student}/delete' => [SchoolClassController::class, 'deleteStudent', ['admin']],
 
             // Sections
             'dashboard/classes/{class}/sections' => [SchoolClassController::class, 'sections', ['admin', 'teacher', 'student']],
