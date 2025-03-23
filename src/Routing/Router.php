@@ -17,7 +17,7 @@ use App\Service\DependencyContainer;
 class Router
 {
     private DependencyContainer $dependencyContainer;
-    /** @var array<string, array{0: string, 1: string}> */
+    /** @var array<string, array{0: string, 1: string, 2: array<string>}> */
     private array $pageMappings;
     private string $defaultPage;
     private string $errorPage;
@@ -30,88 +30,111 @@ class Router
         // Définir le tableau de mappages
         $mappings = [
             // Page d'accueil
-            '' => [DefaultController::class, 'home'],
+            '' => [DefaultController::class, 'home', []],
 
             // Pages d'erreur
-            '403' => [DefaultController::class, 'error403'],
-            '404' => [DefaultController::class, 'error404'],
-            '500' => [DefaultController::class, 'error500'],
+            '403' => [DefaultController::class, 'error403', []],
+            '404' => [DefaultController::class, 'error404', []],
+            '500' => [DefaultController::class, 'error500', []],
 
             // Pages d'authentification
-            'login' => [AuthController::class, 'login'],
-            'register' => [AuthController::class, 'tempregister'],
-            'logout' => [AuthController::class, 'logout'],
-            'resetpassword' => [AuthController::class, 'resetPassword'],
+            'login' => [AuthController::class, 'login', []],
+            'register' => [AuthController::class, 'tempregister', []],
+            'logout' => [AuthController::class, 'logout', []],
+            'resetpassword' => [AuthController::class, 'resetPassword', []],
 
             // Dashboard
-            'dashboard' => [DashboardController::class, 'dashboard'],
-            'dashboard/profile' => [DashboardController::class, 'profile'],
-            'dashboard/profile/edit' => [DashboardController::class, 'updateProfile'],
-            'dashboard/profile/editpassword' => [DashboardController::class, 'updatePassword'],
+            'dashboard' => [DashboardController::class, 'dashboard', ['admin', 'teacher', 'student']],
+            'dashboard/profile' => [DashboardController::class, 'profile', ['admin', 'teacher', 'student']],
+            'dashboard/profile/edit' => [DashboardController::class, 'updateProfile', ['admin', 'teacher', 'student']],
+            'dashboard/profile/editpassword' => [DashboardController::class, 'updatePassword', ['admin', 'teacher', 'student']],
 
-            // User management
-            'dashboard/users' => [UserController::class, 'users'],
-            'dashboard/users/create' => [UserController::class, 'createUser'],
-            'dashboard/users/{user}/edit' => [UserController::class, 'updateUser'],
-            'dashboard/users/{user}/delete' => [UserController::class, 'deleteUser'],
-            'dashboard/users/{user}/resetpassword' => [UserController::class, 'resetPassword'],
+            // Utilisateurs
+            'dashboard/users' => [UserController::class, 'users', ['admin']],
+            'dashboard/users/create' => [UserController::class, 'createUser', ['admin']],
+            'dashboard/users/{user}/edit' => [UserController::class, 'updateUser', ['admin']],
+            'dashboard/users/{user}/delete' => [UserController::class, 'deleteUser', ['admin']],
+            'dashboard/users/{user}/resetpassword' => [UserController::class, 'resetPassword', ['admin']],
 
-            // File management
-            'dashboard/files' => [FileController::class, 'files'],
-            'dashboard/files/upload' => [FileController::class, 'uploadFile'],
-            'dashboard/files/{file}/download' => [FileController::class, 'downloadFile'],
-            'dashboard/files/{file}/delete' => [FileController::class, 'deleteFile'],
+            // Fichiers
+            'dashboard/files' => [FileController::class, 'files', ['admin', 'teacher', 'student']],
+            'dashboard/files/upload' => [FileController::class, 'uploadFile', ['admin', 'teacher', 'student']],
+            'dashboard/files/{file}/download' => [FileController::class, 'downloadFile', ['admin', 'teacher', 'student']],
+            'dashboard/files/{file}/delete' => [FileController::class, 'deleteFile', ['admin', 'teacher', 'student']],
 
-            // Assignments
-            'dashboard/assignments' => [AssignmentController::class, 'assignments'],
+            // Devoirs de l'etudiant
+            'dashboard/assignments' => [AssignmentController::class, 'assignments', ['admin', 'teacher', 'student']],
 
             // Classes
-            'dashboard/classes' => [SchoolClassController::class, 'classes'],
-            'dashboard/classes/create' => [SchoolClassController::class, 'createClass'],
-            'dashboard/classes/{class}/edit' => [SchoolClassController::class, 'updateClass'],
-            'dashboard/classes/{class}/delete' => [SchoolClassController::class, 'deleteClass'],
+            'dashboard/classes' => [SchoolClassController::class, 'classes', ['admin', 'teacher', 'student']],
+            'dashboard/classes/create' => [SchoolClassController::class, 'createClass', ['admin']],
+            'dashboard/classes/{class}/edit' => [SchoolClassController::class, 'updateClass', ['admin']],
+            'dashboard/classes/{class}/delete' => [SchoolClassController::class, 'deleteClass', ['admin']],
 
-            // Students
-            'dashboard/classes/{class}/students' => [SchoolClassController::class, 'students'],
-            'dashboard/classes/{class}/students/add' => [SchoolClassController::class, 'addStudent'],
-            'dashboard/classes/{class}/students/{student}/delete' => [SchoolClassController::class, 'deleteStudent'],
+            // Etudiants
+            'dashboard/classes/{class}/students' => [SchoolClassController::class, 'students', ['admin', 'teacher']],
+            'dashboard/classes/{class}/students/add' => [SchoolClassController::class, 'addStudent', ['admin', 'teacher']],
+            'dashboard/classes/{class}/students/{student}/delete' => [SchoolClassController::class, 'deleteStudent', ['admin', 'teacher']],
 
             // Sections
-            'dashboard/classes/{class}/sections' => [SchoolClassController::class, 'sections'],
-            'dashboard/classes/{class}/sections/create' => [SchoolClassController::class, 'createSection'],
-            'dashboard/classes/{class}/sections/{section}/edit' => [SchoolClassController::class, 'updateSection'],
-            'dashboard/classes/{class}/sections/{section}/delete' => [SchoolClassController::class, 'deleteSection'],
+            'dashboard/classes/{class}/sections' => [SchoolClassController::class, 'sections', ['admin', 'teacher', 'student']],
+            'dashboard/classes/{class}/sections/create' => [SchoolClassController::class, 'createSection', ['admin', 'teacher']],
+            'dashboard/classes/{class}/sections/{section}/edit' => [SchoolClassController::class, 'updateSection', ['admin', 'teacher']],
+            'dashboard/classes/{class}/sections/{section}/delete' => [SchoolClassController::class, 'deleteSection', ['admin', 'teacher']],
 
-            // Section assignments
-            'dashboard/classes/{class}/sections/{section}/assignments' => [SchoolClassController::class, 'assignments'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/details' => [SchoolClassController::class, 'assignmentDetails'],
-            'dashboard/classes/{class}/sections/{section}/assignments/create' => [SchoolClassController::class, 'createAssignment'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/edit' => [SchoolClassController::class, 'updateAssignment'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/delete' => [SchoolClassController::class, 'deleteAssignment'],
+            // Devoirs de la classe
+            'dashboard/classes/{class}/sections/{section}/assignments' => [SchoolClassController::class, 'assignments', ['admin', 'teacher', 'student']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/details' => [SchoolClassController::class, 'assignmentDetails', ['admin', 'teacher', 'student']],
+            'dashboard/classes/{class}/sections/{section}/assignments/create' => [SchoolClassController::class, 'createAssignment', ['admin', 'teacher']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/edit' => [SchoolClassController::class, 'updateAssignment', ['admin', 'teacher']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/delete' => [SchoolClassController::class, 'deleteAssignment', ['admin', 'teacher']],
 
-            // Submissions
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions' => [SchoolClassController::class, 'submissions'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submit' => [SchoolClassController::class, 'submitAssignment'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions/cancel' => [SchoolClassController::class, 'cancelSubmission'],
+            // Soumissions
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions' => [SchoolClassController::class, 'submissions', ['admin', 'teacher', 'student']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submit' => [SchoolClassController::class, 'submitAssignment', ['student']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/submissions/cancel' => [SchoolClassController::class, 'cancelSubmission', ['student']],
 
-            // Files
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/download' => [SchoolClassController::class, 'downloadFile'],
-            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/delete' => [SchoolClassController::class, 'deleteFile'],
+            // Fichiers des devoirs
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/download' => [SchoolClassController::class, 'downloadFile', ['admin', 'teacher', 'student']],
+            'dashboard/classes/{class}/sections/{section}/assignments/{assignment}/files/{file}/delete' => [SchoolClassController::class, 'deleteFile', ['admin', 'teacher']],
         ];
 
         /**
-         * @var array<string, array{0: class-string, 1: string}> $mappings
+         * @var array<string, array{0: class-string, 1: string, 2: array<string>}> $mappings
          */
         $this->pageMappings = $mappings;
 
         $this->defaultPage = '';
         $this->errorPage = '404';
     }
+    /**
+     * Regarde si l'utilisateur a la permission d'acceder a la page
+     *
+     * @param array<string> $allowedRoles Les roles autorises a acceder a la page
+     * @return bool True si l'utilisateur a la permission, sinon False
+     */
+    private function checkPermission(array $allowedRoles): bool
+    {
+        // Si aucun role n'est specifie, tout le monde a la permission
+        if (empty($allowedRoles)) {
+            return true;
+        }
+
+        // Si l'utilisateur n'est pas connecte, il n'a pas la permission
+        if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role'])) {
+            return false;
+        }
+
+        $userRole = $_SESSION['user']['role'];
+
+        // Verifiez si le role de l'utilisateur est dans le tableau des roles autorises
+        return in_array($userRole, $allowedRoles, true);
+    }
 
     /**
-     * Route the request to the appropriate controller method
+     * Route qui demande le controleur approprie
      *
-     * @param mixed $twig The Twig environment instance
+     * @param mixed $twig Instance de la classe Twig
      * @return void
      */
     public function route($twig): void
@@ -135,7 +158,25 @@ class Router
             if (preg_match($regexPattern, $requestedPage, $matches)) {
                 array_shift($matches);
                 $params = $matches;
-                [$controllerClass, $method] = $controllerInfo;
+                [$controllerClass, $method, $allowedRoles] = $controllerInfo;
+
+                // On verifie si l'utilisateur a la permission d'acceder a la page
+                if (!$this->checkPermission($allowedRoles)) {
+
+                    // Si l'utilisateur n'est pas connecte, redirigez-le vers la page de connexion
+                    if (!isset($_SESSION['user'])) {
+                        header('Location: /login');
+                        exit;
+                    }
+
+                    $forbiddenInfo = $this->pageMappings['403'];
+                    [$errorControllerClass, $errorMethod] = $forbiddenInfo;
+                    $errorController = new $errorControllerClass($twig, $this->dependencyContainer);
+                    /** @var callable $callback */
+                    $callback = [$errorController, $errorMethod];
+                    call_user_func($callback);
+                    return;
+                }
 
                 if (class_exists($controllerClass) && method_exists($controllerClass, $method)) {
                     $controller = new $controllerClass($twig, $this->dependencyContainer);

@@ -72,8 +72,8 @@ class AssignmentModel
 
             $assignments[] = [
                 'assignment' => $assignment,
-                'class_id' => isset($row['class_id']) ? (int)$row['class_id'] : 0,
-                'section_id' => isset($row['section_id']) ? (int)$row['section_id'] : 0
+                'class_id' => $row['class_id'],
+                'section_id' => $row['section_id']
             ];
         }
 

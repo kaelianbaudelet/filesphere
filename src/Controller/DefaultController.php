@@ -31,6 +31,11 @@ class DefaultController
         echo $this->twig->render('defaultController/404.html.twig', []);
     }
 
+    public function error403()
+    {
+        echo $this->twig->render('defaultController/403.html.twig', []);
+    }
+
     public function error500()
     {
         echo $this->twig->render('defaultController/500.html.twig', []);

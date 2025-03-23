@@ -362,6 +362,28 @@ class SchoolClassController
             exit;
         }
 
+        $currentDateTime = new \DateTime();
+
+        if ($assignment->getStartPeriod() > $currentDateTime) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Le devoir n\'a pas encore commencé. Vous ne pouvez pas soumettre de fichiers.',
+                'context' => 'modal',
+            ];
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
+        if ($assignment->getEndPeriod() < $currentDateTime && !$assignment->getAllowLateSubmission()) {
+            $_SESSION['alert'] = [
+                'status' => 'error',
+                'message' => 'Le devoir est terminé et les soumissions tardives ne sont pas autorisées.',
+                'context' => 'modal',
+            ];
+            header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
+            exit;
+        }
+
         $files = $_FILES['files'] ?? null;
 
         if (!$files) {
@@ -374,10 +396,10 @@ class SchoolClassController
             exit;
         }
 
-        if ($assignment->getStartPeriod() > new \DateTime() || $assignment->getEndPeriod() < new \DateTime()) {
+        if (count($files['name']) > $assignment->getMaxFiles()) {
             $_SESSION['alert'] = [
                 'status' => 'error',
-                'message' => 'Le devoir est terminé ou n\'a pas encore commencé. Vous ne pouvez pas télécharger de fichiers.',
+                'message' => 'Nombre de fichiers soumis supérieur au nombre maximum autorisé.',
                 'context' => 'modal',
             ];
             header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submit");
