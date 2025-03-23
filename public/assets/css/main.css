@@ -121,6 +121,9 @@ body {
     font-family: "Lexend", sans-serif;
     height: 100%;
     width: 100%;
+    overflow: auto;
+    -ms-overflow-style: none; /* IE 11 */
+    scrollbar-width: none; /* Firefox 64 */
 }
 
 ol,
@@ -299,14 +302,8 @@ textarea {
     display: none;
 }
 
-*::-webkit-scrollbar {
+body::-webkit-scrollbar {
     display: none;
-}
-
-* {
-    overflow: auto;
-    -ms-overflow-style: none; /* IE 11 */
-    scrollbar-width: none; /* Firefox 64 */
 }
 
 [type="color"] {
