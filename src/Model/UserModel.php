@@ -34,13 +34,13 @@ class UserModel
 (:role, :name, :email, :password, :is_active, :reset_token, :reset_token_expires_at)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':role', $user->getRole());
-        $stmt->bindValue(':name', $user->getName());
-        $stmt->bindValue(':email', $user->getEmail());
-        $stmt->bindValue(':password', $user->getPassword());
+        $stmt->bindValue(':role', $user->getRole(), PDO::PARAM_STR);
+        $stmt->bindValue(':name', $user->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':email', $user->getEmail(), PDO::PARAM_STR);
+        $stmt->bindValue(':password', $user->getPassword(), PDO::PARAM_STR);
         $stmt->bindValue(':is_active', (bool)$user->getIsActive(), PDO::PARAM_INT);
-        $stmt->bindValue(':reset_token', $user->getResetToken());
-        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':reset_token', $user->getResetToken(), PDO::PARAM_STR);
+        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -53,7 +53,7 @@ class UserModel
     {
         $sql = "SELECT * FROM User WHERE email = :email";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -82,7 +82,7 @@ class UserModel
     {
         $sql = "SELECT * FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -111,14 +111,14 @@ class UserModel
     {
         $sql = "UPDATE User SET role = :role, name = :name, email = :email, password = :password, is_active = :is_active, reset_token = :reset_token, reset_token_expires_at = :reset_token_expires_at WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
-        $stmt->bindValue(':role', $user->getRole());
-        $stmt->bindValue(':name', $user->getName());
-        $stmt->bindValue(':email', $user->getEmail());
-        $stmt->bindValue(':password', $user->getPassword());
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':role', $user->getRole(), PDO::PARAM_STR);
+        $stmt->bindValue(':name', $user->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':email', $user->getEmail(), PDO::PARAM_STR);
+        $stmt->bindValue(':password', $user->getPassword(), PDO::PARAM_STR);
         $stmt->bindValue(':is_active', (bool)$user->getIsActive(), PDO::PARAM_INT);
-        $stmt->bindValue(':reset_token', $user->getResetToken());
-        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':reset_token', $user->getResetToken(), PDO::PARAM_STR);
+        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -131,13 +131,13 @@ class UserModel
     {
         $sql = "UPDATE User SET role = :role, name = :name, email = :email, is_active = :is_active, reset_token = :reset_token, reset_token_expires_at = :reset_token_expires_at WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
-        $stmt->bindValue(':role', $user->getRole());
-        $stmt->bindValue(':name', $user->getName());
-        $stmt->bindValue(':email', $user->getEmail());
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':role', $user->getRole(), PDO::PARAM_STR);
+        $stmt->bindValue(':name', $user->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':email', $user->getEmail(), PDO::PARAM_STR);
         $stmt->bindValue(':is_active', (bool)$user->getIsActive(), PDO::PARAM_INT);
-        $stmt->bindValue(':reset_token', $user->getResetToken());
-        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':reset_token', $user->getResetToken(), PDO::PARAM_STR);
+        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -258,7 +258,7 @@ class UserModel
     {
         $sql = "DELETE FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -272,8 +272,8 @@ class UserModel
     {
         $sql = "UPDATE User SET password = :password, is_active = 0 WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
-        $stmt->bindValue(':password', $password);
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -287,8 +287,8 @@ class UserModel
     {
         $sql = "UPDATE User SET password = :password, is_active = 1 WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
-        $stmt->bindValue(':password', $password);
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -303,9 +303,9 @@ class UserModel
         SET reset_token = :reset_token, reset_token_expires_at = :reset_token_expires_at
         WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $user->getId());
-        $stmt->bindValue(':reset_token', $user->getResetToken());
-        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':id', $user->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':reset_token', $user->getResetToken(), PDO::PARAM_STR);
+        $stmt->bindValue(':reset_token_expires_at', $user->getResetTokenExpiresAt()?->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 }

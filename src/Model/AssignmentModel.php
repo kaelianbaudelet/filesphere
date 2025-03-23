@@ -32,6 +32,7 @@ class AssignmentModel
      */
     public function getAllAssignments(User $student): array
     {
+        // Sélectionne tous les devoirs d'un élève et les informations associées comme la classe et la section associées
         $stmt = $this->db->prepare('
         SELECT DISTINCT a.*, sa.section_id, cs.class_id
         FROM Assignment a
@@ -42,6 +43,8 @@ class AssignmentModel
         JOIN ClassStudent cst ON c.id = cst.class_id
         WHERE cst.user_id = :studentId
         ');
+
+        // Récupération de l'identifiant de l'élève
         $studentId = $student->getId();
         $stmt->bindParam(':studentId', $studentId, PDO::PARAM_STR);
         $stmt->execute();
@@ -49,7 +52,7 @@ class AssignmentModel
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var array<string, mixed> $row */
 
-            // Make sure we have valid values before creating the Assignment
+            // Création de l'objet Assignment
             $id = isset($row['id']) ? (string)$row['id'] : '';
             $name = isset($row['name']) ? (string)$row['name'] : '';
             $description = isset($row['description']) ? (string)$row['description'] : '';
@@ -70,6 +73,7 @@ class AssignmentModel
                 isset($row['updated_at']) ? new \DateTime((string)$row['updated_at']) : null
             );
 
+            // Ajout du devoir et des informations associées à la liste des devoirs
             $assignments[] = [
                 'assignment' => $assignment,
                 'class_id' => $row['class_id'],

@@ -665,6 +665,7 @@ input[type="file"] {
 .auth-container {
     display: flex;
     height: 100%;
+    width: 100%;
 }
 
 .auth-form {
@@ -781,40 +782,12 @@ input[type="file"] {
     height: 40px;
 }
 
-.epsi-color-green {
-    color: #8fbf55;
-}
-
-.epsi-color-blue {
-    color: #37b7d5;
-}
-
-.epsi-color-magenta {
-    color: #4b4b99;
-}
-
-.epsi-color-purple {
-    color: #935b9e;
-}
-
-.epsi-color-orange {
-    color: #e4813f;
-}
-
-.epsi-color-yellow {
-    color: #fad053;
-}
-
-.epsi-color-red {
-    color: #da4759;
-}
-
 @media (max-width: 868px) {
-    .logo {
+    .auth-container .logo {
         display: none;
     }
 
-    .login-form {
+    .auth-form {
         width: 100%;
         border-right: none;
     }
@@ -2075,4 +2048,52 @@ input[type="file"] {
     display: flex;
     align-items: center;
     gap: 5px;
+}
+
+.demo-banner {
+    background-color: #fef3c7;
+    padding: 8px 0;
+    text-align: center;
+    border-bottom: 1px solid #fcd34d;
+}
+
+.demo-banner-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.demo-banner svg {
+    stroke: #92400e;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .demo-banner-content {
+        padding: 0 16px;
+        font-size: 12px;
+    }
+}
+
+.auth-page-container {
+    display: grid;
+    grid-template-columns: 8px 1fr;
+    height: 100vh;
+    width: 100%;
+}
+
+.sidebar-color {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

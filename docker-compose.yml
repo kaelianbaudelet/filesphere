@@ -2,7 +2,7 @@ services:
 
   app:
     build: .
-    container_name: projetphp_neptune_epsi_apache
+    container_name: projetphp_livrable_epsi_apache
     ports:
       - "80:80"
     volumes:
@@ -22,12 +22,12 @@ services:
 
   db:
     image: mariadb:latest
-    container_name: projetphp_neptune_epsi_bdd
+    container_name: projetphp_livrable_epsi_bdd
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MARIADB_DATABASE: ${DATABASE_NAME:-projetphp_neptune_epsi_bdd}
-      MARIADB_USER: ${DATABASE_USER:-projetphp_neptune_epsi}
+      MARIADB_DATABASE: ${DATABASE_NAME:-projetphp_livrable_epsi_bdd}
+      MARIADB_USER: ${DATABASE_USER:-projetphp_livrable_epsi}
       MARIADB_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - "3306:3306"
@@ -39,7 +39,7 @@ services:
 
   adminer:
     image: adminer:latest
-    container_name: projetphp_neptune_epsi_adminer
+    container_name: projetphp_livrable_epsi_adminer
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: ${DATABASE_PASSWORD}

@@ -72,15 +72,15 @@ class SchoolClassModel
             $this->db->beginTransaction();
             $sql = "INSERT INTO Class (teacher_id, file_id, color, name) VALUES (:teacher_id, :file_id, :color, :name)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId());
-            $stmt->bindValue(':file_id', $class->getIcon() ? $class->getIcon()->getId() : null);
-            $stmt->bindValue(':color', $class->getColor());
-            $stmt->bindValue(':name', $class->getName());
+            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':file_id', $class->getIcon() ? $class->getIcon()->getId() : null, PDO::PARAM_STR);
+            $stmt->bindValue(':color', $class->getColor(), PDO::PARAM_STR);
+            $stmt->bindValue(':name', $class->getName(), PDO::PARAM_STR);
             $stmt->execute();
             $sql = "SELECT id FROM Class WHERE teacher_id = :teacher_id AND name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId());
-            $stmt->bindValue(':name', $class->getName());
+            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':name', $class->getName(), PDO::PARAM_STR);
             $stmt->execute();
             $lastInsertedRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -93,8 +93,8 @@ class SchoolClassModel
             $sql = "INSERT INTO ClassStudent (user_id, class_id) VALUES (:user_id, :class_id)";
             $stmt = $this->db->prepare($sql);
             foreach ($class->getStudents() as $student) {
-                $stmt->bindValue(':user_id', $student->getId());
-                $stmt->bindValue(':class_id', $classId);
+                $stmt->bindValue(':user_id', $student->getId(), PDO::PARAM_STR);
+                $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
                 $stmt->execute();
             }
 
@@ -134,13 +134,13 @@ class SchoolClassModel
 
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                $stmtFile->bindValue(':name', $fileName);
-                $stmtFile->bindValue(':token', $token);
-                $stmtFile->bindValue(':extension', $extension);
-                $stmtFile->bindValue(':size', $files['size'][$i]);
-                $stmtFile->bindValue(':user_id', $user->getId());
+                $stmtFile->bindValue(':name', $fileName, PDO::PARAM_STR);
+                $stmtFile->bindValue(':token', $token, PDO::PARAM_STR);
+                $stmtFile->bindValue(':extension', $extension, PDO::PARAM_STR);
+                $stmtFile->bindValue(':size', $files['size'][$i], PDO::PARAM_INT);
+                $stmtFile->bindValue(':user_id', $user->getId(), PDO::PARAM_STR);
                 $stmtFile->execute();
-                $stmtGetFileId->bindValue(':token', $token);
+                $stmtGetFileId->bindValue(':token', $token, PDO::PARAM_STR);
                 $stmtGetFileId->execute();
                 $lastInsertedRow = $stmtGetFileId->fetch(PDO::FETCH_ASSOC);
 
@@ -162,8 +162,8 @@ class SchoolClassModel
                 $stmtAssignmentFile = $this->db->prepare($sqlAssignmentFile);
 
                 foreach ($fileIds as $fileId) {
-                    $stmtAssignmentFile->bindValue(':assignment_id', $assignment->getId());
-                    $stmtAssignmentFile->bindValue(':file_id', $fileId);
+                    $stmtAssignmentFile->bindValue(':assignment_id', $assignment->getId(), PDO::PARAM_STR);
+                    $stmtAssignmentFile->bindValue(':file_id', $fileId, PDO::PARAM_STR);
                     $stmtAssignmentFile->execute();
                 }
             }
@@ -189,8 +189,8 @@ class SchoolClassModel
                             JOIN AssignmentFile af ON f.id = af.file_id
                             WHERE f.user_id = :user_id AND af.assignment_id = :assignment_id";
             $stmtGetFiles = $this->db->prepare($sqlGetFiles);
-            $stmtGetFiles->bindValue(':user_id', $user->getId());
-            $stmtGetFiles->bindValue(':assignment_id', $assignment->getId());
+            $stmtGetFiles->bindValue(':user_id', $user->getId(), PDO::PARAM_STR);
+            $stmtGetFiles->bindValue(':assignment_id', $assignment->getId(), PDO::PARAM_STR);
             $stmtGetFiles->execute();
             $files = $stmtGetFiles->fetchAll(PDO::FETCH_ASSOC);
             $fileIds = array_column($files, 'id');
@@ -202,12 +202,10 @@ class SchoolClassModel
                 }
             }
 
-            $sqlDeleteAssignmentFile = "DELETE FROM AssignmentFile
-                                       WHERE assignment_id = :assignment_id
-                                       AND file_id IN (SELECT id FROM File WHERE user_id = :user_id)";
+            $sqlDeleteAssignmentFile = "DELETE FROM AssignmentFile WHERE assignment_id = :assignment_id AND file_id IN (SELECT id FROM File WHERE user_id = :user_id)";
             $stmtDeleteAssignmentFile = $this->db->prepare($sqlDeleteAssignmentFile);
-            $stmtDeleteAssignmentFile->bindValue(':user_id', $user->getId());
-            $stmtDeleteAssignmentFile->bindValue(':assignment_id', $assignment->getId());
+            $stmtDeleteAssignmentFile->bindValue(':user_id', $user->getId(), PDO::PARAM_STR);
+            $stmtDeleteAssignmentFile->bindValue(':assignment_id', $assignment->getId(), PDO::PARAM_STR);
             $stmtDeleteAssignmentFile->execute();
 
             if (!empty($fileIds)) {
@@ -215,7 +213,7 @@ class SchoolClassModel
                 $sqlDeleteFile = "DELETE FROM File WHERE id IN ($placeholders)";
                 $stmtDeleteFile = $this->db->prepare($sqlDeleteFile);
                 foreach ($fileIds as $i => $fileId) {
-                    $stmtDeleteFile->bindValue($i + 1, $fileId);
+                    $stmtDeleteFile->bindValue($i + 1, $fileId, PDO::PARAM_STR);
                 }
                 $stmtDeleteFile->execute();
             }
@@ -237,7 +235,7 @@ class SchoolClassModel
     {
         $sql = "SELECT * FROM File WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -266,7 +264,7 @@ class SchoolClassModel
     {
         $sql = "SELECT * FROM Class WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -307,9 +305,9 @@ class SchoolClassModel
         try {
             $sql = "UPDATE Class SET teacher_id = :teacher_id, name = :name, updated_at = NOW() WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $class->getId());
-            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId());
-            $stmt->bindValue(':name', $class->getName());
+            $stmt->bindValue(':id', $class->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':teacher_id', $class->getTeacher()->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':name', $class->getName(), PDO::PARAM_STR);
             return $stmt->execute();
         } catch (Exception $e) {
             throw new Exception("Erreur lors de la mise à jour de la classe : " . $e->getMessage());
@@ -326,13 +324,13 @@ class SchoolClassModel
         try {
             $sql = "UPDATE Assignment SET name = :name, description = :description, start_period = :start_period, end_period = :end_period, allow_late_submission = :allow_late_submission, max_files = :max_files, updated_at = NOW() WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $assignment->getId());
-            $stmt->bindValue(':name', $assignment->getName());
-            $stmt->bindValue(':description', $assignment->getDescription());
-            $stmt->bindValue(':start_period', $assignment->getStartPeriod()->format('Y-m-d H:i:s'));
-            $stmt->bindValue(':end_period', $assignment->getEndPeriod()->format('Y-m-d H:i:s'));
+            $stmt->bindValue(':id', $assignment->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':name', $assignment->getName(), PDO::PARAM_STR);
+            $stmt->bindValue(':description', $assignment->getDescription(), PDO::PARAM_STR);
+            $stmt->bindValue(':start_period', $assignment->getStartPeriod()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(':end_period', $assignment->getEndPeriod()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->bindValue(':allow_late_submission', (int) $assignment->getAllowLateSubmission(), PDO::PARAM_INT);
-            $stmt->bindValue(':max_files', $assignment->getMaxFiles());
+            $stmt->bindValue(':max_files', $assignment->getMaxFiles(), PDO::PARAM_INT);
             return $stmt->execute();
         } catch (Exception $e) {
             throw new Exception("Erreur lors de la mise à jour du devoir : " . $e->getMessage());
@@ -353,11 +351,11 @@ class SchoolClassModel
                 JOIN ClassStudent cs ON c.id = cs.class_id
                 WHERE cs.user_id = :user_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':user_id', $userId);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         } elseif ($user->getRole() === 'teacher') {
             $sql = "SELECT * FROM Class WHERE teacher_id = :teacher_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':teacher_id', $userId);
+            $stmt->bindValue(':teacher_id', $userId, PDO::PARAM_STR);
         } else {
             $sql = "SELECT * FROM Class";
             $stmt = $this->db->prepare($sql);
@@ -405,12 +403,12 @@ class SchoolClassModel
 
             $sql = "DELETE FROM ClassStudent WHERE class_id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':id', $id, PDO::PARAM_STR);
             $stmt->execute();
 
             $sql = "DELETE FROM Class WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':id', $id, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -433,12 +431,12 @@ class SchoolClassModel
 
             $sql = "DELETE FROM SectionAssignment WHERE assignment_id = :assignment_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':assignment_id', $assignmentId);
+            $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
             $stmt->execute();
 
             $sql = "DELETE FROM Assignment WHERE id = :assignment_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':assignment_id', $assignmentId);
+            $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -460,7 +458,7 @@ class SchoolClassModel
                 JOIN ClassStudent cs ON u.id = cs.user_id
                 WHERE cs.class_id = :class_id AND u.role = 'student'";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':class_id', $classId);
+        $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
         $stmt->execute();
 
         $students = [];
@@ -494,7 +492,7 @@ class SchoolClassModel
                 WHERE cs.class_id = :class
                 ORDER BY s.created_at DESC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':class', $classId);
+        $stmt->bindValue(':class', $classId, PDO::PARAM_STR);
         $stmt->execute();
 
         $sections = [];
@@ -529,7 +527,7 @@ class SchoolClassModel
                 WHERE sh.section_id = :section_id
                 ORDER BY h.created_at DESC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':section_id', $sectionId);
+        $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
         $stmt->execute();
 
         $assignments = [];
@@ -581,9 +579,9 @@ class SchoolClassModel
         }
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':assignment_id', $assignmentId);
+        $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
         if ($user->getRole() !== 'admin' && $user->getRole() !== 'teacher') {
-            $stmt->bindValue(':user_id', $user->getId());
+            $stmt->bindValue(':user_id', $user->getId(), PDO::PARAM_STR);
         }
         $stmt->execute();
 
@@ -616,7 +614,7 @@ class SchoolClassModel
                 WHERE hf.assignment_id = :assignment_id
                 ORDER BY f.created_at DESC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':assignment_id', $assignmentId);
+        $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
         $stmt->execute();
 
         $files = [];
@@ -651,7 +649,7 @@ class SchoolClassModel
 
         $sql = "SELECT * FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -686,12 +684,12 @@ class SchoolClassModel
 
             $sql = "INSERT INTO Section (name) VALUES (:name)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':name', $section->getName());
+            $stmt->bindValue(':name', $section->getName(), PDO::PARAM_STR);
             $stmt->execute();
 
             $sql = "SELECT id FROM Section WHERE name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':name', $section->getName());
+            $stmt->bindValue(':name', $section->getName(), PDO::PARAM_STR);
             $stmt->execute();
             $lastInsertedRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -703,8 +701,8 @@ class SchoolClassModel
 
             $sql = "INSERT INTO ClassSection (section_id, class_id) VALUES (:section_id, :class_id)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':section_id', $sectionId);
-            $stmt->bindValue(':class_id', $classId);
+            $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
+            $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -733,17 +731,17 @@ class SchoolClassModel
 (:name, :description, :start_period, :end_period, :allow_late_submission, :max_files)";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':name', $assignment->getName());
-            $stmt->bindValue(':description', $assignment->getDescription());
-            $stmt->bindValue(':start_period', $assignment->getStartPeriod()->format('Y-m-d H:i:s'));
-            $stmt->bindValue(':end_period', $assignment->getEndPeriod()->format('Y-m-d H:i:s'));
+            $stmt->bindValue(':name', $assignment->getName(), PDO::PARAM_STR);
+            $stmt->bindValue(':description', $assignment->getDescription(), PDO::PARAM_STR);
+            $stmt->bindValue(':start_period', $assignment->getStartPeriod()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(':end_period', $assignment->getEndPeriod()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->bindValue(':allow_late_submission', (int) $assignment->getAllowLateSubmission(), PDO::PARAM_INT);
-            $stmt->bindValue(':max_files', $assignment->getMaxFiles());
+            $stmt->bindValue(':max_files', $assignment->getMaxFiles(), PDO::PARAM_INT);
             $stmt->execute();
 
             $sql = "SELECT id FROM Assignment WHERE name = :name ORDER BY created_at DESC LIMIT 1";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':name', $assignment->getName());
+            $stmt->bindValue(':name', $assignment->getName(), PDO::PARAM_STR);
             $stmt->execute();
             $lastInsertedRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -755,8 +753,8 @@ class SchoolClassModel
 
             $sql = "INSERT INTO SectionAssignment (section_id, assignment_id) VALUES (:section_id, :assignment_id)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':section_id', $sectionId);
-            $stmt->bindValue(':assignment_id', $assignmentId);
+            $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
+            $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -803,11 +801,11 @@ class SchoolClassModel
 
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                $stmtFile->bindValue(':name', $fileName);
-                $stmtFile->bindValue(':token', $token);
-                $stmtFile->bindValue(':extension', $extension);
-                $stmtFile->bindValue(':size', $files['size'][$i]);
-                $stmtFile->bindValue(':user_id', $userId);
+                $stmtFile->bindValue(':name', $fileName, PDO::PARAM_STR);
+                $stmtFile->bindValue(':token', $token, PDO::PARAM_STR);
+                $stmtFile->bindValue(':extension', $extension, PDO::PARAM_STR);
+                $stmtFile->bindValue(':size', $files['size'][$i], PDO::PARAM_INT);
+                $stmtFile->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
                 $stmtFile->execute();
 
@@ -834,8 +832,8 @@ class SchoolClassModel
                 $stmtAssignmentFile = $this->db->prepare($sqlAssignmentFile);
 
                 foreach ($fileIds as $fileId) {
-                    $stmtAssignmentFile->bindValue(':assignment_id', $assignmentId);
-                    $stmtAssignmentFile->bindValue(':file_id', $fileId);
+                    $stmtAssignmentFile->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
+                    $stmtAssignmentFile->bindValue(':file_id', $fileId, PDO::PARAM_STR);
                     $stmtAssignmentFile->execute();
                 }
             }
@@ -858,8 +856,8 @@ class SchoolClassModel
         try {
             $sql = "UPDATE Section SET name = :name, updated_at = NOW() WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $section->getId());
-            $stmt->bindValue(':name', $section->getName());
+            $stmt->bindValue(':id', $section->getId(), PDO::PARAM_STR);
+            $stmt->bindValue(':name', $section->getName(), PDO::PARAM_STR);
             return $stmt->execute();
         } catch (Exception $e) {
             throw new Exception("Erreur lors de la mise à jour de la section : " . $e->getMessage());
@@ -875,7 +873,7 @@ class SchoolClassModel
     {
         $sql = "SELECT * FROM Section WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -909,7 +907,7 @@ class SchoolClassModel
     {
         $sql = "SELECT * FROM Assignment WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -955,13 +953,13 @@ class SchoolClassModel
 
             $sql = "DELETE FROM ClassSection WHERE class_id = :class_id AND section_id = :section_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':class_id', $classId);
-            $stmt->bindValue(':section_id', $sectionId);
+            $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
+            $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
             $stmt->execute();
 
             $sql = "DELETE FROM Section WHERE id = :section_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':section_id', $sectionId);
+            $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -984,7 +982,7 @@ class SchoolClassModel
 
             $sql = "SELECT * FROM File WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $fileId);
+            $stmt->bindValue(':id', $fileId, PDO::PARAM_STR);
             $stmt->execute();
             $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -994,7 +992,7 @@ class SchoolClassModel
 
             $sql = "DELETE FROM File WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $fileId);
+            $stmt->bindValue(':id', $fileId, PDO::PARAM_STR);
             $stmt->execute();
 
             $uploadDir = __DIR__ . '/../../public/assets/upload/';
@@ -1024,13 +1022,13 @@ class SchoolClassModel
 
             $sql = "DELETE FROM SectionAssignment WHERE section_id = :section_id AND assignment_id = :assignment_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':section_id', $sectionId);
-            $stmt->bindValue(':assignment_id', $assignmentId);
+            $stmt->bindValue(':section_id', $sectionId, PDO::PARAM_STR);
+            $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
             $stmt->execute();
 
             $sql = "DELETE FROM Assignment WHERE id = :assignment_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':assignment_id', $assignmentId);
+            $stmt->bindValue(':assignment_id', $assignmentId, PDO::PARAM_STR);
             $stmt->execute();
 
             $this->db->commit();
@@ -1052,8 +1050,8 @@ class SchoolClassModel
         try {
             $sql = "SELECT COUNT(*) as count FROM ClassStudent WHERE class_id = :class_id AND user_id = :user_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':class_id', $classId);
-            $stmt->bindValue(':user_id', $studentId);
+            $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
+            $stmt->bindValue(':user_id', $studentId, PDO::PARAM_STR);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1063,8 +1061,8 @@ class SchoolClassModel
 
             $sql = "INSERT INTO ClassStudent (user_id, class_id) VALUES (:user_id, :class_id)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':user_id', $studentId);
-            $stmt->bindValue(':class_id', $classId);
+            $stmt->bindValue(':user_id', $studentId, PDO::PARAM_STR);
+            $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
             return $stmt->execute();
         } catch (Exception $e) {
             throw new Exception("Erreur lors de l'ajout de l'étudiant à la classe : " . $e->getMessage());
@@ -1082,8 +1080,8 @@ class SchoolClassModel
         try {
             $sql = "DELETE FROM ClassStudent WHERE class_id = :class_id AND user_id = :user_id";
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':class_id', $classId);
-            $stmt->bindValue(':user_id', $studentId);
+            $stmt->bindValue(':class_id', $classId, PDO::PARAM_STR);
+            $stmt->bindValue(':user_id', $studentId, PDO::PARAM_STR);
             return $stmt->execute();
         } catch (Exception $e) {
             throw new Exception("Erreur lors de la suppression de l'étudiant de la classe : " . $e->getMessage());

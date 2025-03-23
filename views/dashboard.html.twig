@@ -8,6 +8,10 @@
 		<meta name="keywords" content="livrables, projets, devoirs, dépôt, suivi, étudiants">
 		<meta
 		name="author" content="FileSphere">
+		<!-- favicon -->
+		<link
+		rel="icon" href="{{ asset('/images/favicon.ico') }}" type="image/x-icon">
+
 		<!-- social meta tags -->
 		<meta name="robots" content="index, follow">
 		<meta name="googlebot" content="index, follow">
@@ -18,7 +22,7 @@
 		<meta property="og:description" content="La plateforme tout-en-un pour le dépôt et le suivi de vos devoirs, projets et livrables.">
 		<meta property="og:image" content="{{ asset('/images/bg.png') }}">
 		<meta
-		property="og:url" content="https://www.hotelneptune.com">
+		property="og:url" content="{{ env('APP_URL') }}">
 		<!-- twitter meta tags -->
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:title" content="FileSphere - Plateforme de dépôt et de suivi de livrables">
@@ -34,8 +38,29 @@
 	</head>
 	<body>
 		<div class="app">
+			<div class="grid-colors" style="display: grid; grid-template-columns: repeat(7, 1fr); margin: 0;">
+				<div style="background-color: #8fbf55; height: 8px; width: 100%;"></div>
+				<div style="background-color: #37b7d5; height: 8px; width: 100%;"></div>
+				<div style="background-color: #4b4b99; height: 8px; width: 100%;"></div>
+				<div style="background-color: #935b9e; height: 8px; width: 100%;"></div>
+				<div style="background-color: #e4813f; height: 8px; width: 100%;"></div>
+				<div style="background-color: #fad053; height: 8px; width: 100%;"></div>
+				<div style="background-color: #da4759; height: 8px; width: 100%;"></div>
+			</div>
+			{% if env('APP_ENV') == 'demo' %}
+				<div class="demo-banner">
+					<div class="demo-banner-content">
+						<svg width="20px" height="20px" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M12 16.99V17M12 7V14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#92400E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<span>Vous consultez une version de démonstration de FileSphere. Toutes les données sont réinitialisées chaque jour.</span>
+					</div>
+				</div>
+			{% endif %}
+
 			{% include 'components/changePasswordForm.html.twig' %}
 			<div class="app-body">
+
 				<div class="app-body-navigation">
 					<div class="navigation-container">
 						<div class="navigation-header-container">

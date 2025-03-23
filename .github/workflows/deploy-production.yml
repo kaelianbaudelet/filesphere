@@ -48,7 +48,7 @@ jobs:
       - name: Déploiement de l'application
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            cd /var/www/hotelneptune
+            cd /var/www/hotellivrable
             git pull origin main
             docker-compose up -d --build
           EOF

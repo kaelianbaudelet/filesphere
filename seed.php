@@ -10,9 +10,9 @@ $dotenv->load();
 echo "Seeding de la base de données\n";
 
 $host = $_ENV['DATABASE_HOST'] ?? 'db';
-$dbname = $_ENV['DATABASE_NAME'] ?? 'neptune';
-$username = $_ENV['DATABASE_USER'] ?? 'neptune';
-$password = $_ENV['DATABASE_PASSWORD'] ?? 'neptune';
+$dbname = $_ENV['DATABASE_NAME'] ?? 'livrable';
+$username = $_ENV['DATABASE_USER'] ?? 'livrable';
+$password = $_ENV['DATABASE_PASSWORD'] ?? 'livrable';
 
 try {
     $pdo = new PDO("mysql:host=127.0.0.1;dbname=$dbname", $username, $password);

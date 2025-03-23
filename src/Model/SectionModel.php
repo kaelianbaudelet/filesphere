@@ -34,9 +34,9 @@ class SectionModel
 (:name, :created_at, :updated_at)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':name', $section->getName());
-        $stmt->bindValue(':created_at', $section->getCreatedAt()->format('Y-m-d H:i:s'));
-        $stmt->bindValue(':updated_at', $section->getUpdatedAt()->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':name', $section->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':created_at', $section->getCreatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':updated_at', $section->getUpdatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -49,7 +49,7 @@ class SectionModel
     {
         $sql = "SELECT * FROM Section WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -72,9 +72,9 @@ class SectionModel
     {
         $sql = "UPDATE Section SET name = :name, updated_at = :updated_at WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':name', $section->getName());
-        $stmt->bindValue(':updated_at', $section->getUpdatedAt()->format('Y-m-d H:i:s'));
-        $stmt->bindValue(':id', $section->getId());
+        $stmt->bindValue(':name', $section->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':updated_at', $section->getUpdatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':id', $section->getId(), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -108,7 +108,7 @@ class SectionModel
     {
         $sql = "DELETE FROM Section WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         return $stmt->execute();
     }
 }

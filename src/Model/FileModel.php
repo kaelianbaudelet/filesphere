@@ -35,13 +35,13 @@ class FileModel
 (:token, :name, :extension, :size, :user_id, :created_at, :updated_at)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':token', $file->getToken());
-        $stmt->bindValue(':name', $file->getName());
-        $stmt->bindValue(':extension', $file->getExtension());
-        $stmt->bindValue(':size', $file->getSize());
-        $stmt->bindValue(':user_id', $file->getOwner()->getId());
-        $stmt->bindValue(':created_at', $file->getCreatedAt()->format('Y-m-d H:i:s'));
-        $stmt->bindValue(':updated_at', $file->getUpdatedAt()->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':token', $file->getToken(), PDO::PARAM_STR);
+        $stmt->bindValue(':name', $file->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':extension', $file->getExtension(), PDO::PARAM_STR);
+        $stmt->bindValue(':size', $file->getSize(), PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $file->getOwner()->getId(), PDO::PARAM_STR);
+        $stmt->bindValue(':created_at', $file->getCreatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':updated_at', $file->getUpdatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -54,7 +54,7 @@ class FileModel
     {
         $sql = "SELECT * FROM File WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -81,10 +81,10 @@ class FileModel
     {
         $sql = "UPDATE File SET name = :name, extension = :extension, updated_at = :updated_at WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':name', $file->getName());
-        $stmt->bindValue(':extension', $file->getExtension());
-        $stmt->bindValue(':updated_at', $file->getUpdatedAt()->format('Y-m-d H:i:s'));
-        $stmt->bindValue(':id', $file->getId());
+        $stmt->bindValue(':name', $file->getName(), PDO::PARAM_STR);
+        $stmt->bindValue(':extension', $file->getExtension(), PDO::PARAM_STR);
+        $stmt->bindValue(':updated_at', $file->getUpdatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':id', $file->getId(), PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -122,7 +122,7 @@ class FileModel
     {
         $sql = "SELECT * FROM File WHERE token = :token";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':token', $token);
+        $stmt->bindValue(':token', $token, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -149,7 +149,7 @@ class FileModel
     {
         $sql = "DELETE FROM File WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -162,7 +162,7 @@ class FileModel
     {
         $sql = "SELECT * FROM User WHERE id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
