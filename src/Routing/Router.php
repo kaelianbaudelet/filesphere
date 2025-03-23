@@ -8,7 +8,6 @@ namespace App\Routing;
 use App\Controller\DefaultController;
 use App\Controller\AuthController;
 use App\Controller\UserController;
-use App\Controller\SectionController;
 use App\Controller\SchoolClassController;
 use App\Controller\DashboardController;
 use App\Controller\AssignmentController;

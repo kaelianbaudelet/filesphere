@@ -6,12 +6,12 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Entity\Section;
-use App\Entity\assignment;
+use App\Entity\Assignment;
 
 /**
  * Entité représentant la relation entre une section et un devoir
  */
-class Sectionassignment
+class SectionAssignment
 {
     /**
      * @var Section La section associée au devoir
@@ -19,11 +19,11 @@ class Sectionassignment
     private Section $section;
 
     /**
-     * @var assignment Le devoir associé à la section
+     * @var Assignment Le devoir associé à la section
      */
-    private assignment $assignment;
+    private Assignment $assignment;
 
-    public function __construct(Section $section, assignment $assignment)
+    public function __construct(Section $section, Assignment $assignment)
     {
         $this->section = $section;
         $this->assignment = $assignment;
@@ -52,9 +52,9 @@ class Sectionassignment
     /**
      * Récupère l'identifiant du devoir.
      *
-     * @return assignment Le devoir associé à la section
+     * @return Assignment Le devoir associé à la section
      */
-    public function getassignment(): assignment
+    public function getAssignment(): Assignment
     {
         return $this->assignment;
     }
@@ -62,9 +62,9 @@ class Sectionassignment
     /**
      * Définit l'identifiant du devoir.
      *
-     * @param assignment $assignment Le devoir associé à la section
+     * @param Assignment $assignment Le devoir associé à la section
      */
-    public function setassignment(assignment $assignment): void
+    public function setAssignment(Assignment $assignment): void
     {
         $this->assignment = $assignment;
     }
