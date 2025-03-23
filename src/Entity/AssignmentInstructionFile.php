@@ -11,7 +11,7 @@ use App\Entity\File;
 /**
  * Entité représentant la relation entre un devoir et un fichier (fichier d'instruction)
  */
-class AssignmentFile
+class AssignmentInstructionFile
 {
     /**
      * @var Assignment Le devoir associé au fichier

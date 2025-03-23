@@ -182,6 +182,11 @@ class SchoolClassController
             exit;
         }
 
+        if ($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'teacher' && $assignment->getStartPeriod() > new \DateTime()) {
+            echo $this->twig->render('defaultController/404.html.twig');
+            exit;
+        }
+
         echo $this->twig->render('classController/classSectionAssignmentDetails.html.twig', [
             'class' => $class,
             'section' => $section,
@@ -386,7 +391,6 @@ class SchoolClassController
                 'status' => 'success',
                 'message' => 'Fichiers téléchargés avec succès.',
                 'submitted' => true,
-
             ];
 
             header("Location: /dashboard/classes/{$class_id}/sections/{$section_id}/assignments/{$assignment_id}/details#submitted");
@@ -525,7 +529,7 @@ class SchoolClassController
         }
 
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $file->getName() . '.' . $file->getExtension() . '"');
+        header('Content-Disposition: attachment; filename="' . $file->getName() . '"');
         readfile($filePath);
         exit;
     }

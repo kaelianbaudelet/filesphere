@@ -131,7 +131,9 @@ class SchoolClassModel
 
                 $token = bin2hex(random_bytes(16));
                 $fileName = $files['name'][$i];
+
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
                 $stmtFile->bindValue(':name', $fileName);
                 $stmtFile->bindValue(':token', $token);
                 $stmtFile->bindValue(':extension', $extension);
@@ -798,6 +800,7 @@ class SchoolClassModel
 
                 $token = bin2hex(random_bytes(16));
                 $fileName = $files['name'][$i];
+
                 $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
                 $stmtFile->bindValue(':name', $fileName);
