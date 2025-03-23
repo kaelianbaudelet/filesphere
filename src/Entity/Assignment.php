@@ -56,12 +56,12 @@ class Assignment
     private ?\DateTime $updatedAt;
 
     /**
-     * @var array Les fichiers soumis pour le devoir
+     * @var array<int, File> Les fichiers soumis pour le devoir
      */
-    public ?array $files = [];
+    public array $files = [];
 
     /**
-     * @var array Les fichiers d'instructions du devoir
+     * @var array<int, File> Les fichiers d'instructions du devoir
      */
     public ?array $instructionFiles = [];
 
@@ -270,11 +270,11 @@ class Assignment
     /**
      * Retourne les fichiers soumis pour le devoir.
      *
-     * @return array Les fichiers soumis pour le devoir
+     * @return array<int, File> Les fichiers soumis pour le devoir
      */
     public function getFiles(): array
     {
-        return $this->files;
+        return $this->files ?? [];
     }
 
     /**
@@ -290,11 +290,11 @@ class Assignment
     /**
      * Retourne les fichiers d'instructions du devoir.
      *
-     * @return array Les fichiers d'instructions du devoir
+     * @return array<int, File> Les fichiers d'instructions du devoir
      */
     public function getInstructionFiles(): array
     {
-        return $this->instructionFiles;
+        return $this->instructionFiles ?? [];
     }
 
     /**

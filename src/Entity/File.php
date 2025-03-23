@@ -195,9 +195,9 @@ class File
     /**
      * Retourne la date de création du fichier.
      *
-     * @return \DateTime La date de création du fichier
+     * @return \DateTime|null La date de création du fichier
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
@@ -205,9 +205,19 @@ class File
     /**
      * Définit la date de création du fichier.
      *
-     * @param \DateTime $createdAt La date de création du fichier
+     * @param \DateTime|null $createdAt La date de création du fichier
      */
-    public function getUpdatedAt(): \DateTime
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * Retourne la date de mise à jour du fichier.
+     *
+     * @return \DateTime|null La date de mise à jour du fichier
+     */
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }

@@ -32,16 +32,16 @@ class Mailer
         $this->mail = new PHPMailer(false);
         $this->mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $this->mail->isSMTP();
-        $this->mail->Host       = $_ENV['SMTP_HOST'];
+        $this->mail->Host       = (string)($_ENV['SMTP_HOST'] ?? '');
         $this->mail->SMTPAuth   = true;
-        $this->mail->Username   = $_ENV['SMTP_USER'];
-        $this->mail->Password   = $_ENV['SMTP_PASSWORD'];
+        $this->mail->Username   = (string)($_ENV['SMTP_USER'] ?? '');
+        $this->mail->Password   = (string)($_ENV['SMTP_PASSWORD'] ?? '');
         $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $this->mail->Port       = $_ENV['SMTP_PORT'];
+        $this->mail->Port       = isset($_ENV['SMTP_PORT']) ? (int)$_ENV['SMTP_PORT'] : 465;
         $this->mail->CharSet = 'UTF-8';
         $this->twig = $twig;
-        $this->mail->setFrom($_ENV['SMTP_SEND_EMAIL'], $_ENV['SMTP_SEND_NAME']);
+        $this->mail->setFrom((string)($_ENV['SMTP_SEND_EMAIL'] ?? ''), (string)($_ENV['SMTP_SEND_NAME'] ?? ''));
     }
 
     /**
@@ -91,7 +91,7 @@ class Mailer
             $altBody = 'Votre compte à bien été créé. Vos identifiants sont : ' . $email . ' et ' . $password;
 
             $this->send($to, $toName, $subject, $body, $altBody);
-        } catch (Exception $e) {
+        } catch (Exception) {
             echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
     }
@@ -119,7 +119,7 @@ class Mailer
             $altBody = 'Votre compte a été supprimé par un administrateur';
 
             $this->send($to, $toName, $subject, $body, $altBody);
-        } catch (Exception $e) {
+        } catch (Exception) {
             echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
     }
@@ -149,7 +149,7 @@ class Mailer
             $altBody = 'Votre mot de passe a été réinitialisé par un administrateur. Vos nouveaux identifiants sont : ' . $email . ' et ' . $password;
 
             $this->send($to, $toName, $subject, $body, $altBody);
-        } catch (Exception $e) {
+        } catch (Exception) {
             echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
     }
@@ -171,14 +171,15 @@ class Mailer
 
             $subject = 'Réinitialisation de votre mot de passe';
 
+            $appUrl = $_ENV['APP_URL'] ?? '';
             $body = $this->twig->render('email/accountResetPassword.html.twig', [
                 'user_id' => $user_id,
                 'name' => $name,
                 'email' => $email,
-                'link' => $_ENV['APP_URL'] . '/resetpassword?token=' . $resetToken . '&user_id=' . $user_id
+                'link' => "{$appUrl}/resetpassword?token={$resetToken}&user_id={$user_id}"
             ]);
 
-            $altBody = 'Pour réinitialiser votre mot de passe, cliquez sur le lien suivant : ' . $_ENV['APP_URL'] . '/resetpassword?token=' . $resetToken . '&user_id=' . $user_id;
+            $altBody = "Pour réinitialiser votre mot de passe, cliquez sur le lien suivant : {$appUrl}/resetpassword?token={$resetToken}&user_id={$user_id}";
 
             $this->send($to, $toName, $subject, $body, $altBody);
         } catch (Exception $e) {

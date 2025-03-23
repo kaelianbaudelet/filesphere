@@ -31,9 +31,9 @@ class Section
     private ?\DateTime $updatedAt;
 
     /**
-     * @var array Les devoirs de la section
+     * @var array<int, Assignment> Les devoirs de la section
      */
-    public ?array $assignments = [];
+    public array $assignments = [];
 
     public function __construct(
         ?string $id,
@@ -90,11 +90,11 @@ class Section
     /**
      * Récupère la date de création de la section.
      *
-     * @return \DateTime|null La date de création de la section
+     * @return \DateTime La date de création de la section
      */
     public function getCreatedAt(): \DateTime
     {
-        return $this->createdAt;
+        return $this->createdAt ?? new \DateTime();
     }
 
     /**
@@ -110,11 +110,11 @@ class Section
     /**
      * Récupère la date de mise à jour de la section.
      *
-     * @return \DateTime|null La date de mise à jour de la section
+     * @return \DateTime La date de mise à jour de la section
      */
     public function getUpdatedAt(): \DateTime
     {
-        return $this->updatedAt;
+        return $this->updatedAt ?? new \DateTime();
     }
 
     /**
@@ -130,9 +130,9 @@ class Section
     /**
      * Récupère les devoirs de la section.
      *
-     * @return array Les devoirs de la section
+     * @return array<int, Assignment> Les devoirs de la section
      */
-    public function getassignments(): array
+    public function getAssignments(): array
     {
         return $this->assignments;
     }
@@ -140,9 +140,9 @@ class Section
     /**
      * Ajoute un devoir à la section.
      *
-     * @param assignment $assignment Le devoir à ajouter à la section
+     * @param Assignment $assignment Le devoir à ajouter à la section
      */
-    public function addassignment(assignment $assignment): void
+    public function addAssignment(Assignment $assignment): void
     {
         $this->assignments[] = $assignment;
     }

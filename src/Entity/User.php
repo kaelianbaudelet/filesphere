@@ -177,9 +177,9 @@ class User
     /**
      * Définit le mot de passe de l'utilisateur.
      *
-     * @param string|null $password Le mot de passe de l'utilisateur
+     * @param string $password Le mot de passe de l'utilisateur
      */
-    public function setPassword(string $password): void
+    public function setPassword(?string $password): void
     {
         $this->password = $password;
     }
@@ -247,9 +247,9 @@ class User
     /**
      * Récupère la date de création de l'utilisateur.
      *
-     * @return \DateTime La date de création de l'utilisateur
+     * @return \DateTime|null La date de création de l'utilisateur
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->created_at;
     }
@@ -267,9 +267,9 @@ class User
     /**
      * Récupère la date de mise à jour de l'utilisateur.
      *
-     * @return \DateTime La date de mise à jour de l'utilisateur
+     * @return \DateTime|null La date de mise à jour de l'utilisateur
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }

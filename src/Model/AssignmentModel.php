@@ -28,6 +28,7 @@ class AssignmentModel
      * Récupère tous les devoirs d'un élève
      *
      * @param User $student L'élève
+     * @return array<int, array<string, mixed>>
      */
     public function getAllAssignments(User $student): array
     {
@@ -44,26 +45,35 @@ class AssignmentModel
         $studentId = $student->getId();
         $stmt->bindParam(':studentId', $studentId, PDO::PARAM_STR);
         $stmt->execute();
-
         $assignments = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $assignment = new Assignment(
-                $row['id'],
-                $row['name'],
-                $row['description'],
-                new \DateTime($row['start_period']),
-                new \DateTime($row['end_period']),
-                (int)$row['max_files'],
-                (bool)$row['allow_late_submission'],
-                isset($row['created_at']) ? new \DateTime($row['created_at']) : null,
-                isset($row['updated_at']) ? new \DateTime($row['updated_at']) : null
-            );
+            /** @var array<string, mixed> $row */
 
+            // Make sure we have valid values before creating the Assignment
+            $id = isset($row['id']) ? (string)$row['id'] : '';
+            $name = isset($row['name']) ? (string)$row['name'] : '';
+            $description = isset($row['description']) ? (string)$row['description'] : '';
+            $startPeriod = isset($row['start_period']) ? (string)$row['start_period'] : '';
+            $endPeriod = isset($row['end_period']) ? (string)$row['end_period'] : '';
+            $maxFiles = isset($row['max_files']) ? (int)$row['max_files'] : 0;
+            $allowLateSubmission = isset($row['allow_late_submission']) ? (bool)$row['allow_late_submission'] : false;
+
+            $assignment = new Assignment(
+                $id,
+                $name,
+                $description,
+                new \DateTime($startPeriod),
+                new \DateTime($endPeriod),
+                $maxFiles,
+                $allowLateSubmission,
+                isset($row['created_at']) ? new \DateTime((string)$row['created_at']) : null,
+                isset($row['updated_at']) ? new \DateTime((string)$row['updated_at']) : null
+            );
 
             $assignments[] = [
                 'assignment' => $assignment,
-                'class_id' => $row['class_id'],
-                'section_id' => $row['section_id']
+                'class_id' => isset($row['class_id']) ? (int)$row['class_id'] : 0,
+                'section_id' => isset($row['section_id']) ? (int)$row['section_id'] : 0
             ];
         }
 

@@ -49,12 +49,12 @@ class SchoolClass
     private ?\DateTime $updated_at;
 
     /**
-     * @var array Les élèves de la classe
+     * @var array<int, User> Les élèves de la classe
      */
     public ?array $students = [];
 
     /**
-     * @var array Les sections de la classe
+     * @var array<int, Section> Les sections de la classe
      */
     public ?array $sections = [];
 
@@ -229,7 +229,7 @@ class SchoolClass
     /**
      * Récupère les élèves de la classe.
      *
-     * @return array|null Les élèves de la classe
+     * @return array<int, User>|null Les élèves de la classe
      */
     public function getStudents(): ?array
     {
@@ -237,9 +237,9 @@ class SchoolClass
     }
 
     /**
-     * Ajoute une section à la classe.
+     * Récupère les sections de la classe.
      *
-     * @param Section $section La section à ajouter à la classe
+     * @return array<int, Section>|null Les sections de la classe
      */
     public function getSections(): ?array
     {
@@ -247,9 +247,9 @@ class SchoolClass
     }
 
     /**
-     * Récupère les sections de la classe.
+     * Ajoute une section à la classe.
      *
-     * @return array|null Les sections de la classe
+     * @param Section $section La section à ajouter à la classe
      */
     public function addSection(Section $section): void
     {

@@ -22,14 +22,14 @@ use PDOException;
 class DependencyContainer
 {
     /**
-     * @var array Tableau des instances des services
+     * @var array<string, mixed> Tableau des instances des services
      */
-    private $instances = [];
+    private array $instances = [];
 
     /**
-     * @var Environment Instance de la classe Twig
+     * @var Environment|null Instance de la classe Twig
      */
-    private $twig;
+    private ?Environment $twig = null;
 
     public function __construct() {}
 
@@ -39,7 +39,7 @@ class DependencyContainer
      * @param string $key Clé du service
      * @return mixed Instance du service
      */
-    public function get($key)
+    public function get(string $key)
     {
         if (!isset($this->instances[$key])) {
             $this->instances[$key] = $this->createInstance($key);
@@ -54,53 +54,63 @@ class DependencyContainer
      * @param string $key Clé du service
      * @return mixed Instance du service
      */
-    private function createInstance($key)
+    private function createInstance(string $key)
     {
         switch ($key) {
             case 'PDO':
                 return $this->createPDOInstance();
             case 'Twig':
-                if (!$this->twig) {
+                if ($this->twig === null) {
                     $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates');
                     $this->twig = new Environment($loader);
                 }
                 return $this->twig;
             case 'EmailService':
-                return new Mailer($this->get('Twig'));
+                $twig = $this->get('Twig');
+                assert($twig instanceof Environment);
+                return new Mailer($twig);
             case 'UserModel':
-                $pdo = $this->get('PDO');
-                return new UserModel($pdo);
+                return new UserModel($this->getPDOInstance());
             case 'SectionModel':
-                $pdo = $this->get('PDO');
-                return new SectionModel($pdo);
+                return new SectionModel($this->getPDOInstance());
             case 'SchoolClassModel':
-                $pdo = $this->get('PDO');
-                return new SchoolClassModel($pdo);
+                return new SchoolClassModel($this->getPDOInstance());
             case 'AssignmentModel':
-                $pdo = $this->get('PDO');
-                return new AssignmentModel($pdo);
+                return new AssignmentModel($this->getPDOInstance());
             case 'FileModel':
-                $pdo = $this->get('PDO');
-                return new FileModel($pdo);
+                return new FileModel($this->getPDOInstance());
             default:
                 throw new \Exception("No service found for key: " . $key);
         }
     }
 
-    /**
-     * Crée une instance de la classe PDO.
-     *
-     * @return PDO Instance de la classe PDO
-     */
-    private function createPDOInstance()
+    private function createPDOInstance(): PDO
     {
         try {
-            $pdo = new PDO('mysql:host=' . $_ENV['DATABASE_HOST'] . ';port=' . $_ENV['DATABASE_PORT'] . ';dbname=' .
-                $_ENV['DATABASE_NAME'] . ';charset=utf8', $_ENV['DATABASE_USER'], $_ENV['DATABASE_PASSWORD']);
+            $host = $_ENV['DATABASE_HOST'] ?? '';
+            $port = $_ENV['DATABASE_PORT'] ?? '';
+            $name = $_ENV['DATABASE_NAME'] ?? '';
+            $user = $_ENV['DATABASE_USER'] ?? '';
+            $password = $_ENV['DATABASE_PASSWORD'] ?? '';
+
+            if (!is_string($host) || !is_string($port) || !is_string($name) || !is_string($user) || !is_string($password)) {
+                throw new \InvalidArgumentException("Database environment variables must be strings.");
+            }
+
+            $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8', $host, $port, $name);
+
+            $pdo = new PDO($dsn, $user, $password);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         } catch (PDOException $e) {
             throw new \Exception("PDO connection error: " . $e->getMessage());
         }
+    }
+
+    private function getPDOInstance(): PDO
+    {
+        $pdo = $this->get('PDO');
+        assert($pdo instanceof PDO);
+        return $pdo;
     }
 }
