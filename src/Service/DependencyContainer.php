@@ -16,13 +16,29 @@ use Twig\Environment;
 use PDO;
 use PDOException;
 
+/**
+ * Container d'injection de dépendances.
+ */
 class DependencyContainer
 {
+    /**
+     * @var array Tableau des instances des services
+     */
     private $instances = [];
+
+    /**
+     * @var Environment Instance de la classe Twig
+     */
     private $twig;
 
     public function __construct() {}
 
+    /**
+     * Récupère une instance du service demandé.
+     *
+     * @param string $key Clé du service
+     * @return mixed Instance du service
+     */
     public function get($key)
     {
         if (!isset($this->instances[$key])) {
@@ -32,6 +48,12 @@ class DependencyContainer
         return $this->instances[$key];
     }
 
+    /**
+     * Crée une instance du service demandé.
+     *
+     * @param string $key Clé du service
+     * @return mixed Instance du service
+     */
     private function createInstance($key)
     {
         switch ($key) {
@@ -65,6 +87,11 @@ class DependencyContainer
         }
     }
 
+    /**
+     * Crée une instance de la classe PDO.
+     *
+     * @return PDO Instance de la classe PDO
+     */
     private function createPDOInstance()
     {
         try {

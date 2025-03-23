@@ -9,10 +9,22 @@ use PHPMailer\PHPMailer\Exception;
 
 use Twig\Environment;
 
+/**
+ * Service de gestion des mails
+ */
 class Mailer
 {
+
+    /**
+     * @var PHPMailer Instance de la classe PHPMailer
+     */
     private $mail;
+
+    /**
+     * @var Environment Instance de la classe Twig
+     */
     private $twig;
+
     public function __construct(Environment $twig)
 
     {
@@ -32,7 +44,16 @@ class Mailer
         $this->mail->setFrom($_ENV['SMTP_SEND_EMAIL'], $_ENV['SMTP_SEND_NAME']);
     }
 
-
+    /**
+     * Envoie un mail.
+     *
+     * @param string $to Adresse mail du destinataire
+     * @param string $toName Nom du destinataire
+     * @param string $subject Sujet du mail
+     * @param string $body Contenu HTML du mail
+     * @param string $altBody Contenu texte du mail
+     * @return void
+     */
     private function send($to, $toName, $subject, $body, $altBody)
     {
 
@@ -45,6 +66,14 @@ class Mailer
         $this->mail->send();
     }
 
+    /**
+     * Envoie un mail de création de compte.
+     *
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @param string $password Mot de passe de l'utilisateur
+     * @return void
+     */
     public function sendAccountCreationEmail(string $name, string $email, string $password)
     {
         try {
@@ -67,6 +96,13 @@ class Mailer
         }
     }
 
+    /**
+     * Envoie un mail de suppression de compte.
+     *
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @return void
+     */
     public function sendAccountDeletionEmail(string $name, string $email)
     {
         try {
@@ -88,6 +124,14 @@ class Mailer
         }
     }
 
+    /**
+     * Envoie un mail de réinitialisation de mot de passe par un administrateur.
+     *
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @param string $password Nouveau mot de passe de l'utilisateur
+     * @return void
+     */
     public function sendAccountResetPasswordByAdminEmail(string $name, string $email, string $password)
     {
         try {
@@ -110,6 +154,15 @@ class Mailer
         }
     }
 
+    /**
+     * Envoie un mail de réinitialisation de mot de passe.
+     *
+     * @param string $user_id Identifiant de l'utilisateur
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @param string $resetToken Token de réinitialisation de mot de passe
+     * @return void
+     */
     public function sendAccountResetPasswordEmail(string $user_id, string $name, string $email, string $resetToken)
     {
         try {
@@ -133,6 +186,13 @@ class Mailer
         }
     }
 
+    /**
+     * Envoie un mail de réinitialisation de mot de passe.
+     *
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @return void
+     */
     public function sendClassJoinEmail(string $name, string $email, string $className)
     {
         try {
@@ -155,6 +215,13 @@ class Mailer
         }
     }
 
+    /**
+     * Envoie un mail de réinitialisation de mot de passe.
+     *
+     * @param string $name Nom de l'utilisateur
+     * @param string $email Adresse mail de l'utilisateur
+     * @return void
+     */
     public function sendAccountResetPasswordSuccessNotification(string $name, string $email)
     {
         try {

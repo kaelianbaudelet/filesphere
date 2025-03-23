@@ -8,6 +8,9 @@ namespace App\Model;
 use App\Entity\User;
 use PDO;
 
+/**
+ * Modèle en charge de la gestion des utilisateurs
+ */
 class UserModel
 {
     /**
