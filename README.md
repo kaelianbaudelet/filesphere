@@ -116,6 +116,11 @@ Migrée la base de données avec la commande suivante :
 php migration.php
 ```
 
+**BONUS:** Créer automatiquement des exemples de fausses données en base de données (utilisateurs, classes, devoirs) avec la commande suivante :
+```bash
+php seed.php
+```
+
 6. Création d'un utilisateur administrateur :
 
 > [!IMPORTANT]  

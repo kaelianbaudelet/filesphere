@@ -1,16 +1,16 @@
 # Utilise l'image officielle de PHP 8.2 avec Apache
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 # Copier les fichiers du projet dans le conteneur
 COPY . .
 # Activer mod_rewrite et appliquer la configuration
-RUN a2enmod rewrite && service apache2 restart
+RUN a2enmod rewrite
 
 
 COPY my-vhost.conf /etc/apache2/sites-available/my-vhost.conf
-RUN a2ensite my-vhost.conf && a2dissite 000-default && service apache2 restart
+RUN a2ensite my-vhost.conf && a2dissite 000-default
 
 # Mise à jour des packages système et installation des dépendances
 RUN apt-get update && apt-get install -y \
