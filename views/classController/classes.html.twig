@@ -133,7 +133,7 @@
 										</div>
 									</div>
 								</div>
-								{% if session.user.role in ["teacher", "admin"] %}
+								{% if session.user.role == "admin" %}
 									<details class="dropdown" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0">
 										<summary role="button">
 											<a class="button">

@@ -909,7 +909,7 @@ class SchoolClassController
                 exit;
             }
 
-            echo $this->twig->render('classController/updateClassSectionassignment.html.twig', [
+            echo $this->twig->render('classController/updateClassSectionAssignment.html.twig', [
                 'class' => $class,
                 'section' => $section,
                 'assignment' => $assignment
