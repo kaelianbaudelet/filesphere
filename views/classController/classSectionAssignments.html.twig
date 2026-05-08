@@ -65,7 +65,7 @@
 					de la classe
 					{{ class.name }}
 				</h2>
-				{% if session.user.role == "admin" %}
+				{% if session.user.role == "admin" or session.user.role == "teacher" %}
 					<a href="#creation" class="button">Créer un devoir</a>
 				{% endif %}
 			</div>
@@ -74,7 +74,7 @@
 					{{ session.alert.message }}
 				</p>
 			{% endif %}
-			{% if session.user.role == "admin" %}
+			{% if session.user.role == "admin" or session.user.role == "teacher" %}
 				<div class="overlay" id="creation">
 					<a href="#" class="overlay-content" href="#"></a>
 					<div class="popup" style="max-height: 80vh; overflow-y: auto;">
@@ -134,7 +134,7 @@
 					{% set assignmentStart = assignment.startPeriod|date('Y-m-d') %}
 					{% if assignmentStart <= today or session.user.role in ["teacher", "admin"] %}
 						<div class="assignment">
-							{% if session.user.role == "admin" %}
+							{% if session.user.role == "admin" or session.user.role == "teacher" %}
 								<div class="overlay" id="delete-{{ assignment.id }}">
 									<a href="#" class="overlay-content" href="#"></a>
 									<div class="popup" style="max-height: 80vh; overflow-y: auto;">
