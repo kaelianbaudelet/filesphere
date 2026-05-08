@@ -32,16 +32,16 @@ class Mailer
         $this->mail = new PHPMailer(false);
         $this->mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $this->mail->isSMTP();
-        $this->mail->Host       = (string)($_ENV['SMTP_HOST'] ?? '');
+        $this->mail->Host       = (string)env('SMTP_HOST', '');
         $this->mail->SMTPAuth   = true;
-        $this->mail->Username   = (string)($_ENV['SMTP_USER'] ?? '');
-        $this->mail->Password   = (string)($_ENV['SMTP_PASSWORD'] ?? '');
+        $this->mail->Username   = (string)env('SMTP_USER', '');
+        $this->mail->Password   = (string)env('SMTP_PASSWORD', '');
         $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $this->mail->Port       = isset($_ENV['SMTP_PORT']) ? (int)$_ENV['SMTP_PORT'] : 465;
+        $this->mail->Port       = (int)env('SMTP_PORT', 465);
         $this->mail->CharSet = 'UTF-8';
         $this->twig = $twig;
-        $this->mail->setFrom((string)($_ENV['SMTP_SEND_EMAIL'] ?? ''), (string)($_ENV['SMTP_SEND_NAME'] ?? ''));
+        $this->mail->setFrom((string)env('SMTP_SEND_EMAIL', ''), (string)env('SMTP_SEND_NAME', ''));
     }
 
     /**
@@ -171,7 +171,7 @@ class Mailer
 
             $subject = 'Réinitialisation de votre mot de passe';
 
-            $appUrl = $_ENV['APP_URL'] ?? '';
+            $appUrl = env('APP_URL', '');
             $body = $this->twig->render('email/accountResetPassword.html.twig', [
                 'user_id' => $user_id,
                 'name' => $name,

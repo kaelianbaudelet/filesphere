@@ -50,7 +50,7 @@ class AuthController
     {
 
         // Vérifie si la création de compte temporaire n'est pas activée
-        if ($_ENV['TEMP_REGISTER'] != "true") {
+        if (env('TEMP_REGISTER') !== 'true') {
             // Affiche une page d'erreur 404
             echo $this->twig->render('defaultController/404.html.twig', []);
         }

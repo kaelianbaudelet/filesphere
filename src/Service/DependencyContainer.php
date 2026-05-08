@@ -87,11 +87,11 @@ class DependencyContainer
     private function createPDOInstance(): PDO
     {
         try {
-            $host = $_ENV['DATABASE_HOST'] ?? '';
-            $port = $_ENV['DATABASE_PORT'] ?? '';
-            $name = $_ENV['DATABASE_NAME'] ?? '';
-            $user = $_ENV['DATABASE_USER'] ?? '';
-            $password = $_ENV['DATABASE_PASSWORD'] ?? '';
+            $host = env('DATABASE_HOST', '');
+            $port = env('DATABASE_PORT', '');
+            $name = env('DATABASE_NAME', '');
+            $user = env('DATABASE_USER', '');
+            $password = env('DATABASE_PASSWORD', '');
 
             if (!is_string($host) || !is_string($port) || !is_string($name) || !is_string($user) || !is_string($password)) {
                 throw new \InvalidArgumentException("Database environment variables must be strings.");

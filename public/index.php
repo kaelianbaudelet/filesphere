@@ -24,9 +24,12 @@ $dotenv->safeLoad();
 // Crée une session si elle n'existe pas
 
 if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.gc_maxlifetime', $_ENV['SESSION_LIFETIME']); // Durée de vie maximale de la session
-    ini_set('session.cookie_lifetime', $_ENV['SESSION_LIFETIME']); // Durée de vie maximale du cookie de session
-    ini_set('session.cookie_secure', $_ENV['SESSION_COOKIE_SECURE']); // Le cookie de session doit être transmis via une connexion sécurisée
+    $sessionLifetime = (int) env('SESSION_LIFETIME', 3600);
+    $sessionSecure = env('SESSION_COOKIE_SECURE') === 'true';
+
+    ini_set('session.gc_maxlifetime', (string) $sessionLifetime);
+    ini_set('session.cookie_lifetime', (string) $sessionLifetime);
+    ini_set('session.cookie_secure', $sessionSecure ? '1' : '0');
     session_start();
 }
 
@@ -36,7 +39,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Debug mode avec Symfony ErrorHandler
 
-if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] === 'true') {
+if (env('APP_DEBUG') === 'true') {
     Debug::enable();
     ErrorHandler::register();
     DebugClassLoader::enable();
@@ -48,8 +51,8 @@ if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] === 'true') {
 
 // Mode maintenance de l'application
 
-if (!isset($_ENV['APP_MAINTENANCE'])) {
-    die('The APP_MAINTENANCE key was not found in the .env file, please check the content of the .env file and add the APP_MAINTENANCE key if it does not exist.');
+if (env('APP_MAINTENANCE') === null) {
+    die('The APP_MAINTENANCE key was not found in the environment or .env file. Please check your configuration.');
 }
 
 // ======================================================================
@@ -84,8 +87,8 @@ $twig->addFunction(new \Twig\TwigFunction('vardump', function ($var) {
 
 // env : retourne une variable d'environnement
 
-$twig->addFunction(new \Twig\TwigFunction('env', function ($key) {
-    return $_ENV[$key];
+$twig->addFunction(new \Twig\TwigFunction('env', function ($key, $default = null) {
+    return env($key, $default);
 }));
 
 // session : retourne une variable de session

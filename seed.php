@@ -11,10 +11,10 @@ $dotenv->safeLoad();
 echo "Seeding de la base de données\n";
 
 try {
-    $host = $_ENV['DATABASE_HOST'] ?? 'db';
-    $dbname = $_ENV['DATABASE_NAME'] ?? 'livrable';
-    $username = $_ENV['DATABASE_USER'] ?? 'livrable';
-    $password = $_ENV['DATABASE_PASSWORD'] ?? 'livrable';
+    $host = env('DATABASE_HOST', 'db');
+    $dbname = env('DATABASE_NAME', 'livrable');
+    $username = env('DATABASE_USER', 'livrable');
+    $password = env('DATABASE_PASSWORD', 'livrable');
     
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
