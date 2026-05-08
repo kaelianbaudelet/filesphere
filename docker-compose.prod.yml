@@ -14,6 +14,21 @@ services:
       DATABASE_NAME: ${DATABASE_NAME:-projetphp_livrable_epsi_bdd}
       DATABASE_USER: ${DATABASE_USER:-projetphp_livrable_epsi}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      APP_NAME: ${APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_MAINTENANCE: ${APP_MAINTENANCE}
+      APP_URL: ${APP_URL}
+      TEMP_REGISTER: ${TEMP_REGISTER}
+      APP_DEMO: ${APP_DEMO}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_SEND_EMAIL: ${SMTP_SEND_EMAIL}
+      SMTP_SEND_NAME: ${SMTP_SEND_NAME}
+      SESSION_LIFETIME: ${SESSION_LIFETIME}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
     depends_on:
       db:
         condition: service_healthy
