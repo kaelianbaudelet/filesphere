@@ -94,7 +94,7 @@
 			</div>
 			{% if session.alert and session.alert.submitted %}
 				<div class="overlay" id="submitted">
-					<a href="#" class="overlay-contejnt" href="#"></a>
+					<a href="#" class="overlay-content"></a>
 					<div class="popup" style="max-height: 80vh; overflow-y: auto; height: 50vh; width: 50vh; box-shadow: none; justify-content: center; align-items: center; display: flex; border-radius: 30px; border: 1px solid #ccc;">
 
 						<svg height="300" id="evbRyzWcuwN1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="-20 -60 300 350" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="1686b634d506408598b920f325093177" export-id="c6c896df55b64f338c0cf2d7ab8caa5c" cached="true">
@@ -103,13 +103,16 @@
 								@keyframes hideAfterDelay {
 									0% {
 										opacity: 1;
+										visibility: visible;
 									}
 									99% {
-										opacity: 1; /* Stay fully visible until the very end */
+										opacity: 1;
+										visibility: visible;
 									}
 									100% {
-										opacity: 0; /* Disappear instantly */
-										display: none;
+										opacity: 0;
+										visibility: hidden;
+										pointer-events: none;
 									}
 								}
 
@@ -779,4 +782,12 @@
 {% block js %}
 	{{ parent() }}
 	<script src="/assets/js/uploadarea.js"></script>
+	<script>
+		// Clear the #submitted hash after the animation finishes to avoid modal re-appearing on refresh
+		if (window.location.hash === '#submitted') {
+			setTimeout(() => {
+				window.location.hash = '';
+			}, 4000);
+		}
+	</script>
 {% endblock %}
