@@ -141,7 +141,10 @@ echo "Création des utilisateurs spécifiques...\n";
 $specificUsers = [
     ['admin@exemple.com', 'Admin User', 'admin'],
     ['student@exemple.com', 'Student User', 'student'],
-    ['teacher@exemple.com', 'Teacher User', 'teacher']
+    ['teacher@exemple.com', 'Teacher User', 'teacher'],
+    ['admin@demo.fr', 'Démonstration Admin', 'admin'],
+    ['prof@demo.fr', 'Démonstration Professeur', 'teacher'],
+    ['eleve@demo.fr', 'Démonstration Élève', 'student']
 ];
 
 foreach ($specificUsers as $user) {
@@ -152,7 +155,7 @@ foreach ($specificUsers as $user) {
         continue;
     }
 
-    $password = password_hash('password123', PASSWORD_DEFAULT);
+    $password = password_hash($user[0] === 'admin@demo.fr' ? 'admin' : ($user[0] === 'prof@demo.fr' ? 'prof' : ($user[0] === 'eleve@demo.fr' ? 'eleve' : 'password123')), PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("INSERT INTO User (email, password, name, role, is_active) VALUES (?, ?, ?, ?, 1)");
     $stmt->execute([$user[0], $password, $user[1], $user[2]]);
 }

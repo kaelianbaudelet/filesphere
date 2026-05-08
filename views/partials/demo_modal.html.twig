@@ -1,0 +1,204 @@
+<div id="demoModal" class="demo-modal-overlay" style="display: none;">
+    <div class="demo-modal-content">
+        <div class="demo-modal-sidebar">
+            <div style="background-color: #8fbf55; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #37b7d5; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #4b4b99; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #935b9e; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #e4813f; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #fad053; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #da4759; height: 12.5%; width: 100%;"></div>
+            <div style="background-color: #3498db; height: 12.5%; width: 100%;"></div>
+        </div>
+        <div class="demo-modal-body">
+            <h2>Mode Démonstration</h2>
+            <p>Bienvenue sur <strong>FileSphere</strong>. Explorez le site avec ces comptes de test.</p>
+
+            <div class="demo-accounts">
+                <div class="demo-account-card">
+                    <div class="demo-account-header">
+                        <span class="role-badge admin">ADMIN</span>
+                        <span class="type-label">Compte Administrateur</span>
+                    </div>
+                    <div class="demo-account-info">
+                        <div class="info-row"><span>EMAIL</span> <strong>admin@demo.fr</strong></div>
+                        <div class="info-row"><span>MOT DE PASSE</span> <strong>admin</strong></div>
+                    </div>
+                </div>
+
+                <div class="demo-account-card">
+                    <div class="demo-account-header">
+                        <span class="role-badge teacher">PROFESSEUR</span>
+                        <span class="type-label">Compte Enseignant</span>
+                    </div>
+                    <div class="demo-account-info">
+                        <div class="info-row"><span>EMAIL</span> <strong>prof@demo.fr</strong></div>
+                        <div class="info-row"><span>MOT DE PASSE</span> <strong>prof</strong></div>
+                    </div>
+                </div>
+
+                <div class="demo-account-card">
+                    <div class="demo-account-header">
+                        <span class="role-badge student">ÉLÈVE</span>
+                        <span class="type-label">Compte Étudiant</span>
+                    </div>
+                    <div class="demo-account-info">
+                        <div class="info-row"><span>EMAIL</span> <strong>eleve@demo.fr</strong></div>
+                        <div class="info-row"><span>MOT DE PASSE</span> <strong>eleve</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="closeDemoModal" class="demo-btn">Accéder à la démo →</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.demo-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.demo-modal-content {
+    background: white;
+    width: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.demo-modal-sidebar {
+    width: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.demo-modal-body {
+    padding: 40px;
+    flex: 1;
+    text-align: center;
+}
+
+.demo-modal-body h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+    font-weight: 800;
+}
+
+.demo-modal-body p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.demo-accounts {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.demo-account-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #eee;
+}
+
+.demo-account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.role-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.role-badge.admin { background: #e3f2fd; color: #1976d2; }
+.role-badge.teacher { background: #f3e5f5; color: #7b1fa2; }
+.role-badge.student { background: #e8f5e9; color: #388e3c; }
+
+.type-label {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+}
+
+.demo-account-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.info-row span { color: #999; }
+.info-row strong { color: #333; }
+
+.demo-btn {
+    background: #17c3b2;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.demo-btn:hover {
+    background: #14a093;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('demoModal');
+    const closeBtn = document.getElementById('closeDemoModal');
+    
+    // Check if cookie exists
+    const isDismissed = document.cookie.split('; ').find(row => row.startsWith('filesphere_demo_dismissed='));
+    
+    if (!isDismissed) {
+        modal.style.display = 'flex';
+    }
+    
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+        // Set cookie for 24 hours
+        const date = new Date();
+        date.setTime(date.getTime() + (24 * 60 * 60 * 1000));
+        document.cookie = "filesphere_demo_dismissed=true; expires=" + date.toUTCString() + "; path=/";
+    });
+});
+</script>
