@@ -183,6 +183,22 @@ foreach ($classNames as $className => $sections) {
     
     if ($existingClass) {
         $classId = $existingClass['id'];
+        
+        // Si c'est une démo, on force l'assignation du prof de démo sur certaines classes existantes
+        if ($index % 2 === 0 && $demoTeacherId) {
+            $stmt = $pdo->prepare("UPDATE Class SET teacher_id = ? WHERE id = ?");
+            $stmt->execute([$demoTeacherId, $classId]);
+        }
+        
+        // On s'assure que l'élève de démo est dans la classe
+        if ($index % 2 === 0 && $demoStudentId) {
+            $checkAssoc = $pdo->prepare("SELECT 1 FROM ClassStudent WHERE user_id = ? AND class_id = ?");
+            $checkAssoc->execute([$demoStudentId, $classId]);
+            if (!$checkAssoc->fetch()) {
+                $stmt = $pdo->prepare("INSERT INTO ClassStudent (user_id, class_id) VALUES (?, ?)");
+                $stmt->execute([$demoStudentId, $classId]);
+            }
+        }
     } else {
         $color = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
         $classId = uniqid();
