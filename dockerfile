@@ -41,8 +41,12 @@ RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 RUN echo "date.timezone=Europe/Paris" > /usr/local/etc/php/conf.d/timezone.ini
 
+# Copier et rendre exécutable le script d'entrée
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Exposer le port 80
 EXPOSE 80
 
-# Commande par défaut
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["apache2-foreground"]

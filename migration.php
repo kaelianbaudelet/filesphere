@@ -13,7 +13,8 @@ echo "Migration de la base de données\n";
 try {
 
     echo "Connexion à la base de données...\n";
-    $conn = new PDO('mysql:host=' . '127.0.0.1' . ';port=' . $_ENV['DATABASE_PORT'] . ';dbname=' .
+    $host = $_ENV['DATABASE_HOST'] ?? 'db';
+    $conn = new PDO('mysql:host=' . $host . ';port=' . ($_ENV['DATABASE_PORT'] ?? '3306') . ';dbname=' .
         $_ENV['DATABASE_NAME'] . ';charset=utf8', $_ENV['DATABASE_USER'], $_ENV['DATABASE_PASSWORD']);
 
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

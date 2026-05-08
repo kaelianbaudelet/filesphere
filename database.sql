@@ -1,19 +1,8 @@
--- Suppression des tables si elles existent
+-- Initialisation de la base de données
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS AssignmentInstructionFile;
-DROP TABLE IF EXISTS AssignmentFile;
-DROP TABLE IF EXISTS SectionAssignment;
-DROP TABLE IF EXISTS ClassSection;
-DROP TABLE IF EXISTS ClassStudent;
-DROP TABLE IF EXISTS Assignment;
-DROP TABLE IF EXISTS Section;
-DROP TABLE IF EXISTS Class;
-DROP TABLE IF EXISTS User;
-DROP TABLE IF EXISTS File;
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- Création de la table User
-CREATE TABLE User (
+CREATE TABLE IF NOT EXISTS User (
     id CHAR(36) PRIMARY KEY NOT NULL DEFAULT (UUID()),
     role ENUM('admin', 'teacher', 'student') NOT NULL,
     name VARCHAR(50) NOT NULL,
@@ -27,7 +16,7 @@ CREATE TABLE User (
 );
 
 -- Création de la table File
-CREATE TABLE File (
+CREATE TABLE IF NOT EXISTS File (
     id CHAR(36) PRIMARY KEY NOT NULL DEFAULT (UUID()),
     token VARCHAR(255) UNIQUE,
     name VARCHAR(255) NOT NULL,
@@ -40,7 +29,7 @@ CREATE TABLE File (
 
 );
 -- Création de la table Class
-CREATE TABLE Class (
+CREATE TABLE IF NOT EXISTS Class (
     id CHAR(36) PRIMARY KEY NOT NULL DEFAULT (UUID()),
         teacher_id CHAR(36) NOT NULL,
         file_id CHAR(36) DEFAULT NULL,
@@ -53,7 +42,7 @@ CREATE TABLE Class (
 );
 
 -- Création de la table ClassStudent (relation entre élèves et classes)
-CREATE TABLE ClassStudent (
+CREATE TABLE IF NOT EXISTS ClassStudent (
     user_id CHAR(36) NOT NULL,
     class_id CHAR(36) NOT NULL,
     PRIMARY KEY (user_id, class_id),
@@ -62,7 +51,7 @@ CREATE TABLE ClassStudent (
 );
 
 -- Création de la table Section
-CREATE TABLE Section (
+CREATE TABLE IF NOT EXISTS Section (
     id CHAR(36) PRIMARY KEY NOT NULL DEFAULT (UUID()),
     name VARCHAR(255) NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -70,7 +59,7 @@ CREATE TABLE Section (
 );
 
 -- Création de la table assignment
-CREATE TABLE Assignment (
+CREATE TABLE IF NOT EXISTS Assignment (
     id CHAR(36) PRIMARY KEY NOT NULL DEFAULT (UUID()),
     name VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
@@ -82,7 +71,7 @@ CREATE TABLE Assignment (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 -- Création de la table ClassSection (relation entre classes et sections)
-CREATE TABLE ClassSection (
+CREATE TABLE IF NOT EXISTS ClassSection (
     section_id CHAR(36) NOT NULL,
     class_id CHAR(36) NOT NULL,
     PRIMARY KEY (section_id, class_id),
@@ -91,7 +80,7 @@ CREATE TABLE ClassSection (
 );
 
 -- Création de la table Sectionassignment (relation entre sections et devoirs)
-CREATE TABLE SectionAssignment (
+CREATE TABLE IF NOT EXISTS SectionAssignment (
     section_id CHAR(36) NOT NULL,
     assignment_id CHAR(36) NOT NULL,
     PRIMARY KEY (section_id, assignment_id),
@@ -100,7 +89,7 @@ CREATE TABLE SectionAssignment (
 );
 
 -- Création de la table assignmentFile (relation entre devoirs et fichiers)
-CREATE TABLE AssignmentFile (
+CREATE TABLE IF NOT EXISTS AssignmentFile (
     assignment_id CHAR(36) NOT NULL,
     file_id CHAR(36) NOT NULL,
     PRIMARY KEY (assignment_id, file_id),
@@ -109,7 +98,7 @@ CREATE TABLE AssignmentFile (
 );
 
 -- Création de la table assignmentInstructionFile (relation entre devoirs et fichiers)
-CREATE TABLE AssignmentInstructionFile (
+CREATE TABLE IF NOT EXISTS AssignmentInstructionFile (
     assignment_id CHAR(36) NOT NULL,
     file_id CHAR(36) NOT NULL,
     PRIMARY KEY (assignment_id, file_id),

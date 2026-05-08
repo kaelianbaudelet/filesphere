@@ -10,13 +10,9 @@ $dotenv->load();
 
 echo "Seeding de la base de données\n";
 
-$host = $_ENV['DATABASE_HOST'] ?? 'db';
-$dbname = $_ENV['DATABASE_NAME'] ?? 'livrable';
-$username = $_ENV['DATABASE_USER'] ?? 'livrable';
-$password = $_ENV['DATABASE_PASSWORD'] ?? 'livrable';
-
 try {
-    $pdo = new PDO("mysql:host=127.0.0.1;dbname=$dbname", $username, $password);
+    $host = $_ENV['DATABASE_HOST'] ?? 'db';
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Connexion réussie à la base de données\n";
 } catch (PDOException $e) {
@@ -24,16 +20,7 @@ try {
 }
 
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
-$pdo->exec("TRUNCATE TABLE AssignmentInstructionFile");
-$pdo->exec("TRUNCATE TABLE AssignmentFile");
-$pdo->exec("TRUNCATE TABLE SectionAssignment");
-$pdo->exec("TRUNCATE TABLE ClassSection");
-$pdo->exec("TRUNCATE TABLE ClassStudent");
-$pdo->exec("TRUNCATE TABLE Assignment");
-$pdo->exec("TRUNCATE TABLE Section");
-$pdo->exec("TRUNCATE TABLE Class");
-$pdo->exec("TRUNCATE TABLE User");
-$pdo->exec("TRUNCATE TABLE File");
+// No TRUNCATE in production to preserve data
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
 // Fake data lists
@@ -124,6 +111,13 @@ for ($i = 1; $i <= $totalUsers; $i++) {
     $email = strtolower($firstName . '.' . $lastName . $i . '@exemple.com');
     $password = password_hash('password123', PASSWORD_DEFAULT);
 
+    // Vérifier si l'utilisateur existe déjà
+    $checkStmt = $pdo->prepare("SELECT id FROM User WHERE email = ?");
+    $checkStmt->execute([$email]);
+    if ($checkStmt->fetch()) {
+        continue;
+    }
+
     if ($studentCount < 50 && $i > $totalUsers - (50 - $studentCount)) {
         $role = 'student';
         $studentCount++;
@@ -147,6 +141,13 @@ $specificUsers = [
 ];
 
 foreach ($specificUsers as $user) {
+    // Vérifier si l'utilisateur spécifique existe déjà
+    $checkStmt = $pdo->prepare("SELECT id FROM User WHERE email = ?");
+    $checkStmt->execute([$user[0]]);
+    if ($checkStmt->fetch()) {
+        continue;
+    }
+
     $password = password_hash('password123', PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("INSERT INTO User (email, password, name, role, is_active) VALUES (?, ?, ?, ?, 1)");
     $stmt->execute([$user[0], $password, $user[1], $user[2]]);
@@ -159,44 +160,61 @@ $stmt = $pdo->query("SELECT id FROM User WHERE role = 'teacher' LIMIT 1");
 $teacherId = $stmt->fetchColumn();
 
 foreach ($classNames as $className => $sections) {
-    $color = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+    // Vérifier si la classe existe déjà
+    $checkStmt = $pdo->prepare("SELECT id FROM Class WHERE name = ?");
+    $checkStmt->execute([$className]);
+    $existingClass = $checkStmt->fetch();
+    
+    if ($existingClass) {
+        $classId = $existingClass['id'];
+    } else {
+        $color = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        $classId = uniqid();
+        $stmt = $pdo->prepare("INSERT INTO Class (id, name, color, teacher_id) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$classId, $className, $color, $teacherId]);
 
-    $classId = uniqid();
-    $stmt = $pdo->prepare("INSERT INTO Class (id, name, color, teacher_id) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$classId, $className, $color, $teacherId]);
+        $randomStudents = array_rand($studentIds, min(5, count($studentIds)));
+        if (!is_array($randomStudents)) {
+            $randomStudents = [$randomStudents];
+        }
 
-    $randomStudents = array_rand($studentIds, min(5, count($studentIds)));
-    if (!is_array($randomStudents)) {
-        $randomStudents = [$randomStudents];
-    }
-
-    foreach ($randomStudents as $studentKey) {
-        $studentId = $studentIds[$studentKey];
-        $stmt = $pdo->prepare("INSERT INTO ClassStudent (user_id, class_id) VALUES (?, ?)");
-        $stmt->execute([$studentId, $classId]);
+        foreach ($randomStudents as $studentKey) {
+            $studentId = $studentIds[$studentKey];
+            $stmt = $pdo->prepare("INSERT INTO ClassStudent (user_id, class_id) VALUES (?, ?)");
+            $stmt->execute([$studentId, $classId]);
+        }
     }
 
     foreach ($sections as $sectionName) {
-        $sectionId = uniqid();
-        $stmt = $pdo->prepare("INSERT INTO Section (id, name) VALUES (?, ?)");
-        $stmt->execute([$sectionId, $sectionName]);
+        // Vérifier si la section existe déjà dans cette classe
+        $checkStmt = $pdo->prepare("SELECT s.id FROM Section s JOIN ClassSection cs ON s.id = cs.section_id WHERE s.name = ? AND cs.class_id = ?");
+        $checkStmt->execute([$sectionName, $classId]);
+        $existingSection = $checkStmt->fetch();
 
-        $stmt = $pdo->prepare("INSERT INTO ClassSection (section_id, class_id) VALUES (?, ?)");
-        $stmt->execute([$sectionId, $classId]);
+        if ($existingSection) {
+            $sectionId = $existingSection['id'];
+        } else {
+            $sectionId = uniqid();
+            $stmt = $pdo->prepare("INSERT INTO Section (id, name) VALUES (?, ?)");
+            $stmt->execute([$sectionId, $sectionName]);
 
-        for ($i = 0; $i < 3; $i++) {
-            $title = $assignmentTitles[array_rand($assignmentTitles)];
-            $description = $assignmentDescriptions[array_rand($assignmentDescriptions)];
+            $stmt = $pdo->prepare("INSERT INTO ClassSection (section_id, class_id) VALUES (?, ?)");
+            $stmt->execute([$sectionId, $classId]);
 
-            $startDate = date('Y-m-d H:i:s', strtotime('-' . rand(1, 30) . ' days'));
-            $endDate = date('Y-m-d H:i:s', strtotime('+' . rand(1, 30) . ' days'));
+            for ($i = 0; $i < 3; $i++) {
+                $title = $assignmentTitles[array_rand($assignmentTitles)];
+                $description = $assignmentDescriptions[array_rand($assignmentDescriptions)];
 
-            $assignmentId = uniqid();
-            $stmt = $pdo->prepare("INSERT INTO Assignment (id, name, description, start_period, end_period, max_files, allow_late_submission) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$assignmentId, $title, $description, $startDate, $endDate, rand(1, 5), rand(0, 1)]);
+                $startDate = date('Y-m-d H:i:s', strtotime('-' . rand(1, 30) . ' days'));
+                $endDate = date('Y-m-d H:i:s', strtotime('+' . rand(1, 30) . ' days'));
 
-            $stmt = $pdo->prepare("INSERT INTO SectionAssignment (section_id, assignment_id) VALUES (?, ?)");
-            $stmt->execute([$sectionId, $assignmentId]);
+                $assignmentId = uniqid();
+                $stmt = $pdo->prepare("INSERT INTO Assignment (id, name, description, start_period, end_period, max_files, allow_late_submission) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$assignmentId, $title, $description, $startDate, $endDate, rand(1, 5), rand(0, 1)]);
+
+                $stmt = $pdo->prepare("INSERT INTO SectionAssignment (section_id, assignment_id) VALUES (?, ?)");
+                $stmt->execute([$sectionId, $assignmentId]);
+            }
         }
     }
 }
