@@ -2,12 +2,9 @@ services:
 
   app:
     build: .
-    container_name: projetphp_livrable_epsi_apache
+    container_name: projetphp_livrable_epsi_apache_prod
     ports:
-      - "80:80"
-    volumes:
-      - .:/var/www/html
-      - ./logs:/var/log/apache2
+      - "1919:80"
     environment:
       PHP_DATE_TIMEZONE: ${PHP_DATE_TIMEZONE:-Europe/Paris}
       PHP_MEMORY_LIMIT: ${PHP_MEMORY_LIMIT:-512M}
@@ -19,7 +16,7 @@ services:
 
   db:
     image: mariadb:latest
-    container_name: projetphp_livrable_epsi_bdd
+    container_name: projetphp_livrable_epsi_bdd_prod
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
@@ -27,22 +24,10 @@ services:
       MARIADB_USER: ${DATABASE_USER:-projetphp_livrable_epsi}
       MARIADB_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "3306:3306"
+      - "3310:3306"
     volumes:
-      - db_data:/var/lib/mysql
-
-  adminer:
-    image: adminer:latest
-    container_name: projetphp_livrable_epsi_adminer
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      ADMINER_DEFAULT_DB_DRIVER: mysql
-      ADMINER_DEFAULT_DB_HOST: db
-      ADMINER_DEFAULT_DB_NAME: ${DATABASE_NAME:-projetphp_epsi_bdd}
-    ports:
-      - "9999:8080"
+      - db_data_prod:/var/lib/mysql
 
 volumes:
-  db_data:
+  db_data_prod:
     driver: local
