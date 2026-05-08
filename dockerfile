@@ -29,6 +29,9 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
+# Installation des dépendances avec Composer
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
 # Configuration d'OPcache pour de meilleures performances en production
 RUN echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini && \
     echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/opcache.ini && \
