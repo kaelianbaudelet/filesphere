@@ -160,12 +160,21 @@ foreach ($specificUsers as $user) {
     $stmt->execute([$user[0], $password, $user[1], $user[2]]);
 }
 
+// Récupérer les IDs des comptes de démo
+$stmt = $pdo->prepare("SELECT id FROM User WHERE email = ?");
+$stmt->execute(['prof@demo.fr']);
+$demoTeacherId = $stmt->fetchColumn();
+
+$stmt->execute(['eleve@demo.fr']);
+$demoStudentId = $stmt->fetchColumn();
+
 $stmt = $pdo->query("SELECT id FROM User WHERE role = 'student'");
 $studentIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$stmt = $pdo->query("SELECT id FROM User WHERE role = 'teacher' LIMIT 1");
-$teacherId = $stmt->fetchColumn();
+$stmt = $pdo->query("SELECT id FROM User WHERE role = 'teacher' AND email != 'prof@demo.fr' LIMIT 1");
+$defaultTeacherId = $stmt->fetchColumn();
 
+$index = 0;
 foreach ($classNames as $className => $sections) {
     // Vérifier si la classe existe déjà
     $checkStmt = $pdo->prepare("SELECT id FROM Class WHERE name = ?");
@@ -177,20 +186,37 @@ foreach ($classNames as $className => $sections) {
     } else {
         $color = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
         $classId = uniqid();
+        
+        // Assigner certaines classes au prof de démo
+        $currentTeacherId = ($index % 2 === 0 && $demoTeacherId) ? $demoTeacherId : ($defaultTeacherId ?: $demoTeacherId);
+        
         $stmt = $pdo->prepare("INSERT INTO Class (id, name, color, teacher_id) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$classId, $className, $color, $teacherId]);
+        $stmt->execute([$classId, $className, $color, $currentTeacherId]);
 
         $randomStudents = array_rand($studentIds, min(5, count($studentIds)));
         if (!is_array($randomStudents)) {
             $randomStudents = [$randomStudents];
         }
 
+        // Ajouter l'élève de démo systématiquement à la moitié des classes
+        if ($index % 2 === 0 && $demoStudentId && !in_array($demoStudentId, $randomStudents)) {
+            $randomStudents[] = array_search($demoStudentId, $studentIds);
+        }
+
         foreach ($randomStudents as $studentKey) {
             $studentId = $studentIds[$studentKey];
-            $stmt = $pdo->prepare("INSERT INTO ClassStudent (user_id, class_id) VALUES (?, ?)");
-            $stmt->execute([$studentId, $classId]);
+            if (!$studentId) continue;
+            
+            // Vérifier si l'association existe déjà
+            $checkAssoc = $pdo->prepare("SELECT 1 FROM ClassStudent WHERE user_id = ? AND class_id = ?");
+            $checkAssoc->execute([$studentId, $classId]);
+            if (!$checkAssoc->fetch()) {
+                $stmt = $pdo->prepare("INSERT INTO ClassStudent (user_id, class_id) VALUES (?, ?)");
+                $stmt->execute([$studentId, $classId]);
+            }
         }
     }
+    $index++;
 
     foreach ($sections as $sectionName) {
         // Vérifier si la section existe déjà dans cette classe
