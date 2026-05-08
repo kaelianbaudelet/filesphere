@@ -55,7 +55,7 @@
 					{{ session.alert.message }}
 				</p>
 			{% endif %}
-			{% if session.user.role == "admin" %}
+			{% if session.user.role == "admin" or session.user.role == "teacher" %}
 				<div class="overlay" id="creation">
 					<a href="#" class="overlay-content" href="#"></a>
 					<div class="popup" style="max-height: 80vh; overflow-y: auto;">
