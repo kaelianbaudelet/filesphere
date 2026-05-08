@@ -3,7 +3,7 @@ set -e
 
 echo "Waiting for database to be ready..."
 # Wait for database (simple loop)
-until php -r "new PDO('mysql:host=' . ($_ENV['DATABASE_HOST'] ?? 'db'), $_ENV['DATABASE_USER'], $_ENV['DATABASE_PASSWORD']);" 2>/dev/null; do
+until php -r "new PDO('mysql:host=' . (getenv('DATABASE_HOST') ?: 'db'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));" 2>/dev/null; do
   echo "Database is unavailable - sleeping"
   sleep 2
 done
