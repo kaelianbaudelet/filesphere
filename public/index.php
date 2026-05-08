@@ -15,7 +15,7 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../', '.env');
-$dotenv->load();
+$dotenv->safeLoad();
 
 // ======================================================================
 //  SESSION

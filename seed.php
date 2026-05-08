@@ -6,13 +6,17 @@ require 'vendor/autoload.php';
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$dotenv->safeLoad();
 
 echo "Seeding de la base de données\n";
 
 try {
     $host = $_ENV['DATABASE_HOST'] ?? 'db';
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $dbname = $_ENV['DATABASE_NAME'] ?? 'livrable';
+    $username = $_ENV['DATABASE_USER'] ?? 'livrable';
+    $password = $_ENV['DATABASE_PASSWORD'] ?? 'livrable';
+    
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Connexion réussie à la base de données\n";
 } catch (PDOException $e) {
