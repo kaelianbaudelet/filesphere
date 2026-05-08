@@ -2,8 +2,18 @@
 set -e
 
 echo "Waiting for database to be ready..."
-# Wait for database (simple loop)
-until php -r "new PDO('mysql:host=' . (getenv('DATABASE_HOST') ?: 'db'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));" 2>/dev/null; do
+# Wait for database (robust PHP check)
+until php -r "
+try {
+    \$host = getenv('DATABASE_HOST') ?: 'db';
+    \$port = getenv('DATABASE_PORT') ?: '3306';
+    \$user = getenv('DATABASE_USER');
+    \$pass = getenv('DATABASE_PASSWORD');
+    new PDO(\"mysql:host=\$host;port=\$port\", \$user, \$pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    exit(0);
+} catch (Exception \$e) {
+    exit(1);
+}" 2>/dev/null; do
   echo "Database is unavailable - sleeping"
   sleep 2
 done

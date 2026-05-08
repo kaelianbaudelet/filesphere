@@ -15,7 +15,8 @@ services:
       DATABASE_USER: ${DATABASE_USER:-projetphp_livrable_epsi}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
 
   db:
@@ -31,6 +32,11 @@ services:
       - "3310:3306"
     volumes:
       - db_data_prod:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -p\"$$MARIADB_ROOT_PASSWORD\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   db_data_prod:
